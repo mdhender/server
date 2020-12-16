@@ -5,12 +5,7 @@
       "home": {
         "system": "23-22-05",
         "world": ""
-      },
-      "colonies": [],
-      "factories": [],
-      "farms": [],
-      "mines": [],
-      "ships": []
+      }
     },
     "yojimbo": {
       "name": "yojimbo",
@@ -20,7 +15,6 @@
       }
     }
   },
-  "independent": [],
   "systems": [
     {
       "system_id": "f17dd67d-6798-450d-b84a-f5cb13b93ff8",
@@ -678,5 +672,31 @@
         }
       ]
     }
-  ]
+  ],
+  "colonies": [],
+  "factories": [],
+  "farms": [],
+  "independent": [],
+  "mines": [],
+  "population": [],
+  "ships": [],
+  "anti_missiles": [],
+  "assault_craft": [],
+  "assault_weapons": [],
+  "automation": [],
+  "energy_shields": [],
+  "energy_weapons": [],
+  "hyper_engines":[],
+  "laboratories": [],
+  "life_support": [],
+  "military_robots": [],
+  "missile_launchers": [],
+  "missiles": [],
+  "power_plants": [],
+  "robot_probes": [],
+  "sensors": [],
+  "light_structural_units": [],
+  "space_drives": [],
+  "structural_units": [],
+  "transports": []
 }
