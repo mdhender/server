@@ -20,9 +20,9 @@ import (
 	"log"
 )
 
-type Engine struct{}
+type State struct{}
 
-func (e *Engine) PostOrders(orders Orders) error {
+func (e *State) PostOrders(orders Orders) error {
 	// do something with the orders
 	var debug bool
 	for i, order := range orders {

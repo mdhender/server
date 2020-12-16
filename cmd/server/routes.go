@@ -52,7 +52,7 @@ func (s *server) postOrders() http.HandlerFunc {
 		log.Printf("[orders] %d %v\n", orders.Len(), orders)
 
 		// do something with the orders
-		var e engine.Engine
+		var e engine.State
 		if err := e.PostOrders(orders); err != nil {
 			jsonapi.Error(w, r, http.StatusInternalServerError, err)
 			return
