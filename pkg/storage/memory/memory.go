@@ -28,6 +28,9 @@ func New() (*Store, error) {
 	return m, nil
 }
 
+// MockData based on Stan Sakai's classic Usagi Yojimbo.
+//   https://stansakai.com/
+//   http://www.usagiyojimbo.com/
 func (m *Store) MockData() {
 	usagi := &user{
 		id:      "bf4c8168-6aab-409d-80cf-a4ee901904ef",
@@ -39,15 +42,17 @@ func (m *Store) MockData() {
 	m.users.id[usagi.id] = usagi
 	m.users.name[usagi.name] = usagi.id
 
-	yojimbo := &user{
+	yōjinbō := &user{
 		id:      "236bb1a5-1ae8-411a-a71f-791f4f03aa99",
-		email:   "yojimbo@server.example.com",
-		name:    "yojimbo",
+		email:   "yōjinbō@server.example.com",
+		name:    "yōjinbō",
 		roles:   []string{"user"},
 		created: time.Now(),
 	}
-	m.users.id[yojimbo.id] = yojimbo
-	m.users.name[yojimbo.name] = yojimbo.id
+	m.users.id[yōjinbō.id] = yōjinbō
+	m.users.name[yōjinbō.name] = yōjinbō.id
+
+	// game named Musha Shugyō
 }
 
 type Store struct {

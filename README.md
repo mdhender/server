@@ -27,3 +27,19 @@ against the new State.
 Permissions seem basic - every Player has access to their data.
 That data would include their sensor probes and whatever
 their Ships were able to see in a System.
+
+# Mock Data
+The mock data uses character names from
+[Stan Sakai](https://stansakai.com/)'s
+[Usagi Yojimbo](http://www.usagiyojimbo.com/).
+
+From the [Wikipedia](https://en.wikipedia.org/wiki/Usagi_Yojimbo) article:
+
+    Usagi Yojimbo (兎用心棒, Usagi Yōjinbō, "rabbit bodyguard") is a
+    comic book series created by Stan Sakai. It is set primarily at
+    the beginning of the Edo period of Japanese history and features
+    anthropomorphic animals replacing humans. The main character is
+    a rabbit rōnin, Miyamoto Usagi, whom Sakai based partially on
+    the famous swordsman Miyamoto Musashi. Usagi wanders the land on
+    a musha shugyō (warrior's pilgrimage), occasionally selling his
+    services as a bodyguard. 
