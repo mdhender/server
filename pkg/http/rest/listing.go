@@ -26,8 +26,61 @@ import (
 	"net/http"
 )
 
+// GetGame returns a specific game
+func GetGame(ls listing.Service) http.HandlerFunc {
+	type okResult struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+
+	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := way.Param(r.Context(), "id")
+		game, err := ls.GetGame(a, id)
+		if err != nil {
+			if errors.Is(err, listing.ErrUserNotFound) {
+				jsonapi.Error(w, r, http.StatusNotFound, listing.ErrGameNotFound)
+				return
+			}
+			jsonapi.Error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		jsonapi.Ok(w, r, http.StatusOK, okResult{game.ID, game.Name})
+	}
+}
+
+// GetGames returns all games
+func GetGames(ls listing.Service) http.HandlerFunc {
+	type detail struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	type okResult []detail
+
+	type formInput struct {
+		Data []string `json:"data"`
+	}
+
+	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var ids []string
+		var list okResult = []detail{} // create an empty list since we never return nil
+		for _, game := range ls.GetGames(a, ids...) {
+			list = append(list, detail{
+				ID:   game.ID,
+				Name: game.Name,
+			})
+		}
+		jsonapi.Ok(w, r, http.StatusOK, list)
+	}
+}
+
 // GetUser returns a specific user
-func GetUser(ls listing.UserService) http.HandlerFunc {
+func GetUser(ls listing.Service) http.HandlerFunc {
 	type okResult struct {
 		ID    string `json:"id"`
 		Name  string `json:"name"`
@@ -53,7 +106,7 @@ func GetUser(ls listing.UserService) http.HandlerFunc {
 }
 
 // GetUsers returns all users
-func GetUsers(ls listing.UserService) http.HandlerFunc {
+func GetUsers(ls listing.Service) http.HandlerFunc {
 	type detail struct {
 		ID    string `json:"id"`
 		Name  string `json:"name"`

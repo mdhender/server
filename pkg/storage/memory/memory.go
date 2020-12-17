@@ -17,42 +17,13 @@
 // Package memory implements in-memory data storage.
 package memory
 
-import (
-	"time"
-)
-
 func New() (*Store, error) {
 	m := &Store{}
+	m.games.id = make(map[string]*game)
+	m.games.name = make(map[string]string)
 	m.users.id = make(map[string]*user)
 	m.users.name = make(map[string]string)
 	return m, nil
-}
-
-// MockData based on Stan Sakai's classic Usagi Yojimbo.
-//   https://stansakai.com/
-//   http://www.usagiyojimbo.com/
-func (m *Store) MockData() {
-	usagi := &user{
-		id:      "bf4c8168-6aab-409d-80cf-a4ee901904ef",
-		email:   "usagi@server.example.com",
-		name:    "usagi",
-		roles:   []string{"admin", "user"},
-		created: time.Now(),
-	}
-	m.users.id[usagi.id] = usagi
-	m.users.name[usagi.name] = usagi.id
-
-	yōjinbō := &user{
-		id:      "236bb1a5-1ae8-411a-a71f-791f4f03aa99",
-		email:   "yōjinbō@server.example.com",
-		name:    "yōjinbō",
-		roles:   []string{"user"},
-		created: time.Now(),
-	}
-	m.users.id[yōjinbō.id] = yōjinbō
-	m.users.name[yōjinbō.name] = yōjinbō.id
-
-	// game named Musha Shugyō
 }
 
 type Store struct {

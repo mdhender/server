@@ -361,7 +361,7 @@ func (s *server) getPlayer() http.HandlerFunc {
 }
 
 // getUser returns a specific user
-func (s *server) getUser(ls listing.UserService) http.HandlerFunc {
+func (s *server) getUser(ls listing.Service) http.HandlerFunc {
 	type okResult struct {
 		ID    string `json:"id"`
 		Name  string `json:"name"`

@@ -36,7 +36,7 @@ func run(cfg *config) error {
 	if cfg.MockData {
 		ds.MockData()
 	}
-	rc.services.userListing = ds
+	rc.services.listing = ds
 
 	var options []func(*server) error
 	options = append(options, setSalt(cfg.Server.Salt))

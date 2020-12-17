@@ -21,7 +21,56 @@ import (
 	"github.com/mdhender/server/pkg/listing"
 )
 
-// This file implements the listing.UserRepository interface
+// This file implements the listing.Repository interface
+
+// GetGame returns a listing of a game if the caller is authorized to list that game.
+// If the caller is not authorized or the game does not exist, it returns the not found error.
+func (m *Store) GetGame(a *auth.Authorization, id string) (listing.Game, error) {
+	isAuthorized := a.HasRole("admin") || a.ID == id
+	if isAuthorized {
+		if game, ok := m.games.id[id]; ok {
+			return listing.Game{
+				ID:   game.id,
+				Name: game.name,
+			}, nil
+		}
+	}
+	return listing.Game{}, listing.ErrGameNotFound
+}
+
+// GetGames returns a listing of games that the call is authorized to list.
+// If the list of ids passed in is empty, we attempt to return all games.
+// Otherwise, we return only the games in the list.
+// We never return nil, even if there are no games.
+func (m *Store) GetGames(a *auth.Authorization, ids ...string) []listing.Game {
+	var list []listing.Game = []listing.Game{}
+	isAdmin := a.HasRole("admin")
+	if len(ids) == 0 { // this is a request for all games
+		for _, game := range m.games.id {
+			isAuthorized := isAdmin || a.ID == game.id
+			if isAuthorized {
+				list = append(list, listing.Game{
+					ID:   game.id,
+					Name: game.name,
+				})
+			}
+		}
+		return list
+	}
+	// a request for a specific set of games
+	for _, id := range ids {
+		isAuthorized := isAdmin || a.ID == id
+		if isAuthorized {
+			if game, ok := m.games.id[id]; ok {
+				list = append(list, listing.Game{
+					ID:   game.id,
+					Name: game.name,
+				})
+			}
+		}
+	}
+	return list
+}
 
 // GetUser returns a listing of a user if the caller is authorized to list that user.
 // If the caller is not authorized or the user does not exist, it returns the not found error.
@@ -59,18 +108,19 @@ func (m *Store) GetUsers(a *auth.Authorization, ids ...string) []listing.User {
 				})
 			}
 		}
-	} else { // a request for a specific set of users
-		for _, id := range ids {
-			isAuthorized := isAdmin || a.ID == id
-			if isAuthorized {
-				if user, ok := m.users.id[id]; ok {
-					list = append(list, listing.User{
-						ID:      user.id,
-						Email:   user.email,
-						Name:    user.name,
-						Created: user.created,
-					})
-				}
+		return list
+	}
+	// a request for a specific set of users
+	for _, id := range ids {
+		isAuthorized := isAdmin || a.ID == id
+		if isAuthorized {
+			if user, ok := m.users.id[id]; ok {
+				list = append(list, listing.User{
+					ID:      user.id,
+					Email:   user.email,
+					Name:    user.name,
+					Created: user.created,
+				})
 			}
 		}
 	}

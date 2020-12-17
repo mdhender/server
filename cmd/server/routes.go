@@ -26,15 +26,15 @@ import (
 func routes(s *server, rc routeConfig) http.Handler {
 	router := way.NewRouter()
 
-	router.Handle("GET", "/api/games", s.getAllGames())
-	router.Handle("GET", "/api/games/:id", s.getGame())
+	router.Handle("GET", "/api/games", rest.GetGames(rc.services.listing))
+	router.Handle("GET", "/api/games/:id", rest.GetGame(rc.services.listing))
 	router.Handle("GET", "/api/games/:id/players", s.getGamePlayers())
 	router.Handle("GET", "/api/games/:id/players/:playerName", s.getGamePlayer())
 	router.Handle("GET", "/api/games/:id/players/:playerName/printout", s.getGamePlayerPrintout())
 	router.Handle("GET", "/api/games/:id/systems", s.getGameSystems())
 	router.Handle("GET", "/api/games/:id/systems/:systemId", s.getGameSystem())
-	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.userListing))
-	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.userListing))
+	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.listing))
+	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.listing))
 	router.Handle("GET", "/api/version", s.getVersion())
 
 	router.Handle("POST", "/api/engine/restart", s.restart())
@@ -53,6 +53,6 @@ type routeConfig struct {
 	gameFileSavePath string
 	notFound         http.Handler
 	services         struct {
-		userListing listing.UserService
+		listing listing.Service
 	}
 }

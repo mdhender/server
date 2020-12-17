@@ -22,38 +22,28 @@ import (
 	"time"
 )
 
-// GameRepository defines requirements for fetching data.
-type GameRepository interface {
+// Repository defines requirements for fetching data.
+type Repository interface {
 	GetGame(a *auth.Authorization, id string) (Game, error)
 	GetGames(a *auth.Authorization, ids ...string) []Game
-}
 
-// UserRepository defines requirements for fetching data.
-type UserRepository interface {
 	GetUser(a *auth.Authorization, id string) (User, error)
 	GetUsers(a *auth.Authorization, ids ...string) []User
 }
 
-// GameService provides listing operations.
-type GameService interface {
+// Service provides listing operations.
+type Service interface {
 	GetGame(a *auth.Authorization, id string) (Game, error)
 	GetGames(a *auth.Authorization, ids ...string) []Game
-}
 
-// UserService provides listing operations.
-type UserService interface {
 	GetUser(a *auth.Authorization, id string) (User, error)
 	GetUsers(a *auth.Authorization, ids ...string) []User
-}
-
-type ListingService interface {
-	GameService
-	UserService
 }
 
 // Game defines the properties of a game.
 type Game struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // User defines the properties of a user.
@@ -65,35 +55,34 @@ type User struct {
 }
 
 type service struct {
-	game GameRepository
-	user UserRepository
+	r Repository
 }
 
 // NewService creates a listing service with the necessary dependencies
-func NewService(game GameRepository, user UserRepository) ListingService {
-	return &service{game: game, user: user}
+func NewService(r Repository) Service {
+	return &service{r: r}
 }
 
 // GetGame returns a specific game if the entity is authorized to list that game.
 func (s *service) GetGame(a *auth.Authorization, id string) (Game, error) {
-	return s.game.GetGame(a, id)
+	return s.r.GetGame(a, id)
 }
 
 // GetGames returns all games that the entity is authorized to list.
 // It never returns an error or a nil list.
 func (s *service) GetGames(a *auth.Authorization, ids ...string) []Game {
-	return s.game.GetGames(a, ids...)
+	return s.r.GetGames(a, ids...)
 }
 
 // GetUser returns a specific user if the entity is authorized to list that user.
 func (s *service) GetUser(a *auth.Authorization, id string) (User, error) {
-	return s.user.GetUser(a, id)
+	return s.r.GetUser(a, id)
 }
 
 // GetUsers returns all users that the entity is authorized to list.
 // It never returns an error or a nil list.
 func (s *service) GetUsers(a *auth.Authorization, ids ...string) []User {
-	return s.user.GetUsers(a, ids...)
+	return s.r.GetUsers(a, ids...)
 }
 
 // ErrGameNotFound is used when the game is not found.
