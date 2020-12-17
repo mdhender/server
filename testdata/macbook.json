@@ -1,5 +1,6 @@
 {
   "game-file-save-path": "/Users/mdhender/Software/server/testdata/",
+  "mock-data": true,
   "public-root": "/Users/mdhender/Software/server/public",
   "salt": ".pepper."
 }

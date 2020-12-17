@@ -25,5 +25,6 @@ type user struct {
 	id      string
 	email   string
 	name    string
+	roles   []string
 	created time.Time
 }

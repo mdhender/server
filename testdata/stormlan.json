@@ -1,5 +1,6 @@
 {
   "game-file-save-path": "D:/GoLand/server/testdata/",
+  "mock-data": true,
   "public-root": "D:/GoLand/server/public",,
   "salt": ".pepper."
 }

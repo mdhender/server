@@ -47,6 +47,7 @@ type config struct {
 	Games struct {
 		FileSavePath string
 	}
+	MockData   bool
 	SampleData *sampleData
 }
 
@@ -94,6 +95,7 @@ func getConfig() (*config, error) {
 		gamesFileSavePath  = fs.String("game-file-save-path", cfg.Games.FileSavePath, "path to save game files to")
 		cookiesHttpOnly    = fs.Bool("cookies-http-only", cfg.Cookies.HttpOnly, "set HttpOnly flag on cookies")
 		cookiesSecure      = fs.Bool("cookies-secure", cfg.Cookies.Secure, "set Secure flag on cookies")
+		mockData           = fs.Bool("mock-data", cfg.MockData, "generate mock data for testing")
 		serverScheme       = fs.String("scheme", cfg.Server.Scheme, "http scheme, either 'http' or 'https'")
 		serverHost         = fs.String("host", cfg.Server.Host, "host name (or IP) to listen on")
 		serverPort         = fs.String("port", cfg.Server.Port, "port to listen on")
@@ -113,6 +115,7 @@ func getConfig() (*config, error) {
 	cfg.Cookies.HttpOnly = *cookiesHttpOnly
 	cfg.Cookies.Secure = *cookiesSecure
 	cfg.Games.FileSavePath = *gamesFileSavePath
+	cfg.MockData = *mockData
 	cfg.Server.Scheme = *serverScheme
 	cfg.Server.Host = *serverHost
 	cfg.Server.Port = *serverPort

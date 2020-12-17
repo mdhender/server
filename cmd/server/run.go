@@ -29,9 +29,12 @@ func run(cfg *config) error {
 		notFound:         http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)),
 	}
 
-	ds, err := memory.MockData()
+	ds, err := memory.New()
 	if err != nil {
 		return err
+	}
+	if cfg.MockData {
+		ds.MockData()
 	}
 	rc.services.userListing = ds
 

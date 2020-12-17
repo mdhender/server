@@ -28,13 +28,12 @@ func New() (*Store, error) {
 	return m, nil
 }
 
-func MockData() (*Store, error) {
-	m, err := New()
-
+func (m *Store) MockData() {
 	usagi := &user{
 		id:      "bf4c8168-6aab-409d-80cf-a4ee901904ef",
 		email:   "usagi@server.example.com",
 		name:    "usagi",
+		roles:   []string{"admin", "user"},
 		created: time.Now(),
 	}
 	m.users.id[usagi.id] = usagi
@@ -44,12 +43,11 @@ func MockData() (*Store, error) {
 		id:      "236bb1a5-1ae8-411a-a71f-791f4f03aa99",
 		email:   "yojimbo@server.example.com",
 		name:    "yojimbo",
+		roles:   []string{"user"},
 		created: time.Now(),
 	}
 	m.users.id[yojimbo.id] = yojimbo
 	m.users.name[yojimbo.name] = yojimbo.id
-
-	return m, err
 }
 
 type Store struct {
