@@ -14,30 +14,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+// Package memory implements in-memory data storage.
+package memory
 
-import (
-	"github.com/mdhender/server/pkg/handlers/spa"
-	"github.com/mdhender/server/pkg/storage/memory"
-	"log"
-	"net/http"
-)
+func New() (*Store, error) {
+	m := &Store{}
+	m.users.data = make(map[string]*user)
+	return m, nil
+}
 
-func run(cfg *config) error {
-	ds, err := memory.New()
-	if err != nil {
-		return err
+type Store struct {
+	users struct {
+		// data is a map from user name to user properties
+		data map[string]*user
 	}
-
-	var options []func(*server) error
-	options = append(options, setSalt(cfg.Server.Salt))
-
-	srv, err := newServer(cfg, options...)
-	if err != nil {
-		return err
-	}
-	srv.Handler = routes(srv, http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)), cfg.Games.FileSavePath, ds)
-
-	log.Printf("[server] listening on %s\n", srv.Addr)
-	return srv.ListenAndServe()
 }

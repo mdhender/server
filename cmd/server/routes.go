@@ -17,11 +17,12 @@
 package main
 
 import (
+	"github.com/mdhender/server/pkg/listing"
 	"github.com/mdhender/server/pkg/way"
 	"net/http"
 )
 
-func routes(s *server, spa http.Handler, gameFileSavePath string) http.Handler {
+func routes(s *server, spa http.Handler, gameFileSavePath string, ls listing.Service) http.Handler {
 	router := way.NewRouter()
 
 	router.Handle("GET", "/api/games", s.getAllGames())
