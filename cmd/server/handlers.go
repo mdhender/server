@@ -25,6 +25,7 @@ import (
 	"github.com/mdhender/server/pkg/gamemeta"
 	"github.com/mdhender/server/pkg/games"
 	"github.com/mdhender/server/pkg/jsonapi"
+	"github.com/mdhender/server/pkg/listing"
 	"github.com/mdhender/server/pkg/orders"
 	"github.com/mdhender/server/pkg/prng"
 	"github.com/mdhender/server/pkg/systems"
@@ -360,7 +361,7 @@ func (s *server) getPlayer() http.HandlerFunc {
 }
 
 // getUser returns a specific user
-func (s *server) getUser() http.HandlerFunc {
+func (s *server) getUser(ls listing.Service) http.HandlerFunc {
 	type okResult struct {
 		ID    string `json:"id"`
 		Name  string `json:"name"`

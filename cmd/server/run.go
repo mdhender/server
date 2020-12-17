@@ -24,10 +24,16 @@ import (
 )
 
 func run(cfg *config) error {
-	ds, err := memory.New()
+	rc := routeConfig{
+		gameFileSavePath: cfg.Games.FileSavePath,
+		notFound:         http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)),
+	}
+
+	ds, err := memory.MockData()
 	if err != nil {
 		return err
 	}
+	rc.services.userListing = ds
 
 	var options []func(*server) error
 	options = append(options, setSalt(cfg.Server.Salt))
@@ -35,11 +41,6 @@ func run(cfg *config) error {
 	srv, err := newServer(cfg, options...)
 	if err != nil {
 		return err
-	}
-	rc := routeConfig{
-		gameFileSavePath: cfg.Games.FileSavePath,
-		notFound:         http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)),
-		ls:               ds,
 	}
 	srv.Handler = routes(srv, rc)
 

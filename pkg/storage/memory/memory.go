@@ -17,15 +17,46 @@
 // Package memory implements in-memory data storage.
 package memory
 
+import (
+	"time"
+)
+
 func New() (*Store, error) {
 	m := &Store{}
-	m.users.data = make(map[string]*user)
+	m.users.id = make(map[string]*user)
+	m.users.name = make(map[string]string)
 	return m, nil
+}
+
+func MockData() (*Store, error) {
+	m, err := New()
+
+	usagi := &user{
+		id:      "bf4c8168-6aab-409d-80cf-a4ee901904ef",
+		email:   "usagi@server.example.com",
+		name:    "usagi",
+		created: time.Now(),
+	}
+	m.users.id[usagi.id] = usagi
+	m.users.name[usagi.name] = usagi.id
+
+	yojimbo := &user{
+		id:      "236bb1a5-1ae8-411a-a71f-791f4f03aa99",
+		email:   "yojimbo@server.example.com",
+		name:    "yojimbo",
+		created: time.Now(),
+	}
+	m.users.id[yojimbo.id] = yojimbo
+	m.users.name[yojimbo.name] = yojimbo.id
+
+	return m, err
 }
 
 type Store struct {
 	users struct {
-		// data is a map from user name to user properties
-		data map[string]*user
+		// id is a map from user id to user properties
+		id map[string]*user
+		// name is a map from user name to user id
+		name map[string]string
 	}
 }

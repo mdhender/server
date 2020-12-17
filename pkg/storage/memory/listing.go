@@ -28,7 +28,7 @@ import (
 func (m *Store) GetAllUsers(a *auth.Authorization) []listing.User {
 	var list []listing.User = []listing.User{}
 	isAdmin := a.HasRole("admin")
-	for _, user := range m.users.data {
+	for _, user := range m.users.id {
 		isAuthorized := isAdmin || a.ID == user.id
 		if isAuthorized {
 			list = append(list, listing.User{
@@ -47,7 +47,7 @@ func (m *Store) GetAllUsers(a *auth.Authorization) []listing.User {
 func (m *Store) GetUser(a *auth.Authorization, id string) (listing.User, error) {
 	isAuthorized := a.HasRole("admin") || a.ID == id
 	if isAuthorized {
-		if user, ok := m.users.data[id]; ok {
+		if user, ok := m.users.id[id]; ok {
 			return listing.User{
 				ID:      user.id,
 				Email:   user.email,

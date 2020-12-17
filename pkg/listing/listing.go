@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-// UserRepository defines requirements for fetching data.
+// Repository defines requirements for fetching data.
 type Repository interface {
 	GetAllUsers(a *auth.Authorization) []User
 	GetUser(a *auth.Authorization, id string) (User, error)

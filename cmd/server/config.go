@@ -70,7 +70,6 @@ type sampleData struct {
 // The command line overrides environment variables overides configuration file override default values.
 func getConfig() (*config, error) {
 	var cfg config
-	cfg.Games.FileSavePath = "D:/GoLand/server/testdata/"
 	cfg.SampleData = &sampleData{}
 	cfg.SampleData.Game.ID = "6b91f8d4-42ed-4148-bb20-eb9b31c91eb0"
 	cfg.SampleData.Game.Name = "sample"
@@ -87,7 +86,6 @@ func getConfig() (*config, error) {
 	cfg.Server.Timeout.Idle = 10 * time.Second
 	cfg.Server.Timeout.Read = 5 * time.Second
 	cfg.Server.Timeout.Write = 10 * time.Second
-	cfg.Server.PublicRoot = "D:/GoLand/server/public"
 
 	var (
 		fs                 = flag.NewFlagSet("server", flag.ExitOnError)

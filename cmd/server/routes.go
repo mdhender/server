@@ -17,6 +17,7 @@
 package main
 
 import (
+	"github.com/mdhender/server/pkg/http/rest"
 	"github.com/mdhender/server/pkg/listing"
 	"github.com/mdhender/server/pkg/way"
 	"net/http"
@@ -32,8 +33,8 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("GET", "/api/games/:id/players/:playerName/printout", s.getGamePlayerPrintout())
 	router.Handle("GET", "/api/games/:id/systems", s.getGameSystems())
 	router.Handle("GET", "/api/games/:id/systems/:systemId", s.getGameSystem())
-	router.Handle("GET", "/api/users", s.getAllUsers())
-	router.Handle("GET", "/api/users/:id", s.getUser())
+	router.Handle("GET", "/api/users", rest.GetAllUsers(rc.services.userListing))
+	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.userListing))
 	router.Handle("GET", "/api/version", s.getVersion())
 
 	router.Handle("POST", "/api/engine/restart", s.restart())
@@ -50,6 +51,8 @@ func routes(s *server, rc routeConfig) http.Handler {
 
 type routeConfig struct {
 	gameFileSavePath string
-	ls               listing.Service
 	notFound         http.Handler
+	services         struct {
+		userListing listing.Service
+	}
 }
