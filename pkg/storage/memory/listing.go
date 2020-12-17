@@ -21,26 +21,7 @@ import (
 	"github.com/mdhender/server/pkg/listing"
 )
 
-// This file implements the listing.Repository interface
-
-// GetAllUsers returns a listing of all users that the call is authorized to list.
-// It never returns nil, even if there are no users.
-func (m *Store) GetAllUsers(a *auth.Authorization) []listing.User {
-	var list []listing.User = []listing.User{}
-	isAdmin := a.HasRole("admin")
-	for _, user := range m.users.id {
-		isAuthorized := isAdmin || a.ID == user.id
-		if isAuthorized {
-			list = append(list, listing.User{
-				ID:      user.id,
-				Email:   user.email,
-				Name:    user.name,
-				Created: user.created,
-			})
-		}
-	}
-	return list
-}
+// This file implements the listing.UserRepository interface
 
 // GetUser returns a listing of a user if the caller is authorized to list that user.
 // If the caller is not authorized or the user does not exist, it returns the not found error.
@@ -57,4 +38,41 @@ func (m *Store) GetUser(a *auth.Authorization, id string) (listing.User, error) 
 		}
 	}
 	return listing.User{}, listing.ErrUserNotFound
+}
+
+// GetUsers returns a listing of users that the call is authorized to list.
+// If the list of ids passed in is empty, we attempt to return all users.
+// Otherwise, we return only the users in the list.
+// We never return nil, even if there are no users.
+func (m *Store) GetUsers(a *auth.Authorization, ids ...string) []listing.User {
+	var list []listing.User = []listing.User{}
+	isAdmin := a.HasRole("admin")
+	if len(ids) == 0 { // this is a request for all users
+		for _, user := range m.users.id {
+			isAuthorized := isAdmin || a.ID == user.id
+			if isAuthorized {
+				list = append(list, listing.User{
+					ID:      user.id,
+					Email:   user.email,
+					Name:    user.name,
+					Created: user.created,
+				})
+			}
+		}
+	} else { // a request for a specific set of users
+		for _, id := range ids {
+			isAuthorized := isAdmin || a.ID == id
+			if isAuthorized {
+				if user, ok := m.users.id[id]; ok {
+					list = append(list, listing.User{
+						ID:      user.id,
+						Email:   user.email,
+						Name:    user.name,
+						Created: user.created,
+					})
+				}
+			}
+		}
+	}
+	return list
 }

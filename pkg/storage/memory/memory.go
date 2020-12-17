@@ -56,6 +56,12 @@ func (m *Store) MockData() {
 }
 
 type Store struct {
+	games struct {
+		// id is a map from game id to game properties
+		id map[string]*game
+		// name is a map from game name to game id
+		name map[string]string
+	}
 	users struct {
 		// id is a map from user id to user properties
 		id map[string]*user

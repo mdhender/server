@@ -17,6 +17,7 @@
 package rest
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/mdhender/server/pkg/auth"
 	"github.com/mdhender/server/pkg/jsonapi"
@@ -25,33 +26,8 @@ import (
 	"net/http"
 )
 
-// GetAllUsers returns all users
-func GetAllUsers(ls listing.Service) http.HandlerFunc {
-	type detail struct {
-		ID    string `json:"id"`
-		Name  string `json:"name"`
-		Email string `json:"email"`
-	}
-	type okResult []detail
-
-	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
-	a.Roles["admin"] = true
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		var list okResult = []detail{} // create an empty list since we never return nil
-		for _, user := range ls.GetAllUsers(a) {
-			list = append(list, detail{
-				ID:    user.ID,
-				Email: user.Email,
-				Name:  user.Name,
-			})
-		}
-		jsonapi.Ok(w, r, http.StatusOK, list)
-	}
-}
-
 // GetUser returns a specific user
-func GetUser(ls listing.Service) http.HandlerFunc {
+func GetUser(ls listing.UserService) http.HandlerFunc {
 	type okResult struct {
 		ID    string `json:"id"`
 		Name  string `json:"name"`
@@ -73,5 +49,50 @@ func GetUser(ls listing.Service) http.HandlerFunc {
 			return
 		}
 		jsonapi.Ok(w, r, http.StatusOK, okResult{user.ID, user.Name, user.Email})
+	}
+}
+
+// GetUsers returns all users
+func GetUsers(ls listing.UserService) http.HandlerFunc {
+	type detail struct {
+		ID    string `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	}
+	type okResult []detail
+
+	type formInput struct {
+		Data []string `json:"data"`
+	}
+
+	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var ids []string
+		if r.Method == "POST" { // support sending a list of ids to fetch
+			// Enforce a maximum read of 1MB from the request body.
+			dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
+			// reject any request with unknown verbs.
+			dec.DisallowUnknownFields()
+			var input formInput
+			if err := dec.Decode(&formInput{}); err != nil {
+				jsonapi.Error(w, r, http.StatusBadRequest, err)
+				return
+			}
+			if len(input.Data) != 0 {
+				ids = input.Data
+			}
+		}
+
+		var list okResult = []detail{} // create an empty list since we never return nil
+		for _, user := range ls.GetUsers(a, ids...) {
+			list = append(list, detail{
+				ID:    user.ID,
+				Email: user.Email,
+				Name:  user.Name,
+			})
+		}
+		jsonapi.Ok(w, r, http.StatusOK, list)
 	}
 }

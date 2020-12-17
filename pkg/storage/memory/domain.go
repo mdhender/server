@@ -20,6 +20,23 @@ import (
 	"time"
 )
 
+// game defines the properties of a game.
+type game struct {
+	id        string
+	name      string
+	created   time.Time
+	completed time.Time
+	players   []player
+}
+
+// player defines the properties of a player,
+// which is an instance of a user in a game.
+type player struct {
+	name string // name of player
+	user string // name of user
+	// todo: more information on the player. stuff like race, possessions, etc
+}
+
 // user defines the properties of a user.
 type user struct {
 	id      string

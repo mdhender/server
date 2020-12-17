@@ -33,7 +33,7 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("GET", "/api/games/:id/players/:playerName/printout", s.getGamePlayerPrintout())
 	router.Handle("GET", "/api/games/:id/systems", s.getGameSystems())
 	router.Handle("GET", "/api/games/:id/systems/:systemId", s.getGameSystem())
-	router.Handle("GET", "/api/users", rest.GetAllUsers(rc.services.userListing))
+	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.userListing))
 	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.userListing))
 	router.Handle("GET", "/api/version", s.getVersion())
 
@@ -53,6 +53,6 @@ type routeConfig struct {
 	gameFileSavePath string
 	notFound         http.Handler
 	services         struct {
-		userListing listing.Service
+		userListing listing.UserService
 	}
 }
