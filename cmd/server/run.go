@@ -36,7 +36,12 @@ func run(cfg *config) error {
 	if err != nil {
 		return err
 	}
-	srv.Handler = routes(srv, http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)), cfg.Games.FileSavePath, ds)
+	rc := routeConfig{
+		gameFileSavePath: cfg.Games.FileSavePath,
+		notFound:         http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)),
+		ls:               ds,
+	}
+	srv.Handler = routes(srv, rc)
 
 	log.Printf("[server] listening on %s\n", srv.Addr)
 	return srv.ListenAndServe()

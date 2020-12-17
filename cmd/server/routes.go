@@ -22,7 +22,7 @@ import (
 	"net/http"
 )
 
-func routes(s *server, spa http.Handler, gameFileSavePath string, ls listing.Service) http.Handler {
+func routes(s *server, rc routeConfig) http.Handler {
 	router := way.NewRouter()
 
 	router.Handle("GET", "/api/games", s.getAllGames())
@@ -39,11 +39,17 @@ func routes(s *server, spa http.Handler, gameFileSavePath string, ls listing.Ser
 	router.Handle("POST", "/api/engine/restart", s.restart())
 	router.Handle("POST", "/api/games", s.addGame())
 	router.Handle("POST", "/api/games/:id/orders", s.postGameOrders())
-	router.Handle("POST", "/api/games/:id/save", s.postGameSave(gameFileSavePath))
+	router.Handle("POST", "/api/games/:id/save", s.postGameSave(rc.gameFileSavePath))
 	router.Handle("POST", "/api/users", s.addUser())
 
 	// assume that all other routes are to serve the front end application
-	router.NotFound = spa
+	router.NotFound = rc.notFound
 
 	return router
+}
+
+type routeConfig struct {
+	gameFileSavePath string
+	ls               listing.Service
+	notFound         http.Handler
 }
