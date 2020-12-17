@@ -18,10 +18,7 @@ package gamemeta
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/google/uuid"
 	"github.com/mdhender/server/pkg/games"
-	"github.com/mdhender/server/pkg/prng"
 	"github.com/mdhender/server/pkg/users"
 	"time"
 )
@@ -45,7 +42,7 @@ func (meta *GameMeta) addPlayer(user *users.User, name string) error {
 	}
 	for _, u := range meta.Players {
 		if u.ID == user.ID {
-			return ErrDuplicateUserName
+			return ErrDuplicateUser
 		}
 	}
 	meta.Players[name] = user

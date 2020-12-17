@@ -19,17 +19,25 @@ package main
 import (
 	"crypto/md5"
 	"encoding/binary"
-	engine "github.com/mdhender/server"
+	"github.com/mdhender/server"
+	"github.com/mdhender/server/pkg/gamemeta"
+	"github.com/mdhender/server/pkg/users"
 	"io"
 	"net"
 	"net/http"
 )
+
+var versionMajor string = "0"
+var versionMinor string = "0"
+var versionPatch string = "0"
 
 // server defines the server
 type server struct {
 	http.Server
 	salt  string
 	turns []engine.Orders
+	games map[string]*gamemeta.GameMeta
+	users *users.Users
 }
 
 // serverContextKey is the context key type for storing parameters in context.Context.

@@ -46,4 +46,3 @@ func routes(s *server, spa http.Handler, gameFileSavePath string) http.Handler {
 
 	return router
 }
-
