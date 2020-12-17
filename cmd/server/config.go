@@ -44,7 +44,7 @@ type config struct {
 		HttpOnly bool
 		Secure   bool
 	}
-	Engine struct {
+	Games struct {
 		FileSavePath string
 	}
 	SampleData *sampleData
@@ -70,7 +70,7 @@ type sampleData struct {
 // The command line overrides environment variables overides configuration file override default values.
 func getConfig() (*config, error) {
 	var cfg config
-	cfg.Engine.FileSavePath = "D:/GoLand/server/testdata/"
+	cfg.Games.FileSavePath = "D:/GoLand/server/testdata/"
 	cfg.SampleData = &sampleData{}
 	cfg.SampleData.Game.ID = "6b91f8d4-42ed-4148-bb20-eb9b31c91eb0"
 	cfg.SampleData.Game.Name = "sample"
@@ -93,7 +93,7 @@ func getConfig() (*config, error) {
 		fs                 = flag.NewFlagSet("server", flag.ExitOnError)
 		fileName           = fs.String("config", cfg.FileName, "config file (optional)")
 		debug              = fs.Bool("debug", cfg.Debug, "log debug information (optional)")
-		engineFileSavePath = fs.String("file-save-path", cfg.Engine.FileSavePath, "path to save game files to")
+		gamesFileSavePath  = fs.String("game-file-save-path", cfg.Games.FileSavePath, "path to save game files to")
 		cookiesHttpOnly    = fs.Bool("cookies-http-only", cfg.Cookies.HttpOnly, "set HttpOnly flag on cookies")
 		cookiesSecure      = fs.Bool("cookies-secure", cfg.Cookies.Secure, "set Secure flag on cookies")
 		serverScheme       = fs.String("scheme", cfg.Server.Scheme, "http scheme, either 'http' or 'https'")
@@ -114,7 +114,7 @@ func getConfig() (*config, error) {
 	cfg.FileName = *fileName
 	cfg.Cookies.HttpOnly = *cookiesHttpOnly
 	cfg.Cookies.Secure = *cookiesSecure
-	cfg.Engine.FileSavePath = *engineFileSavePath
+	cfg.Games.FileSavePath = *gamesFileSavePath
 	cfg.Server.Scheme = *serverScheme
 	cfg.Server.Host = *serverHost
 	cfg.Server.Port = *serverPort
@@ -124,6 +124,6 @@ func getConfig() (*config, error) {
 	cfg.Server.Timeout.Read = *serverTimeoutRead
 	cfg.Server.Timeout.Write = *serverTimeoutWrite
 
-	log.Printf("[config] %-30s == %q\n", "file-save-path", cfg.Engine.FileSavePath)
+	log.Printf("[config] %-30s == %q\n", "game-file-save-path", cfg.Games.FileSavePath)
 	return &cfg, nil
 }

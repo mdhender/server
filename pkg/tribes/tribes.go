@@ -14,24 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+package tribes
 
 import (
-	"github.com/mdhender/server/pkg/handlers/spa"
-	"log"
-	"net/http"
+	"encoding/json"
+	"github.com/mdhender/server/pkg/planets"
+	"github.com/mdhender/server/pkg/systems"
 )
 
-func run(cfg *config) error {
-	var options []func(*server) error
-	options = append(options, setSalt(cfg.Server.Salt))
+type Tribe struct {
+	Name       string          `json:"name"`        // name of the tribe
+	HomeSystem *systems.System `json:"home_system"` // tribe's home system
+	HomeWorld  *planets.Planet `json:"home_world"`  // tribe's home world
+}
 
-	srv, err := newServer(cfg, options...)
-	if err != nil {
-		return err
+func (t *Tribe) MarshalJSON() ([]byte, error) {
+	data := struct {
+		Name       string `json:"name"`
+		HomeSystem string `json:"home_system"`
+		HomeWorld  string `json:"home_world"`
+	}{
+		Name:       t.Name,
+		HomeSystem: t.HomeSystem.Name,
+		HomeWorld:  t.HomeWorld.ID,
 	}
-	srv.Handler = routes(srv, http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)), cfg.Games.FileSavePath)
-
-	log.Printf("[server] listening on %s\n", srv.Addr)
-	return srv.ListenAndServe()
+	return json.Marshal(&data)
 }

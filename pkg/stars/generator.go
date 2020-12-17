@@ -14,24 +14,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+package stars
 
 import (
-	"github.com/mdhender/server/pkg/handlers/spa"
-	"log"
-	"net/http"
+	"fmt"
+	"github.com/google/uuid"
+	"github.com/mdhender/server/pkg/orbits"
+	"github.com/mdhender/server/pkg/prng"
 )
 
-func run(cfg *config) error {
-	var options []func(*server) error
-	options = append(options, setSalt(cfg.Server.Salt))
+type Generator func(ts prng.Generator) (*Star, error)
 
-	srv, err := newServer(cfg, options...)
-	if err != nil {
-		return err
+// DefaultGenerator returns a generator with the following rules:
+//   11 orbits
+//   Orbit[0] is treated as the "11th Orbit" in the rulebook.
+func DefaultGenerator() Generator {
+	generateOrbit := orbits.DefaultGenerator()
+	return func(ts prng.Generator) (*Star, error) {
+		var s Star
+		s.ID = uuid.New().String()
+		s.Name = fmt.Sprintf("%02d-%02d-%02d", 0, 0, 0)
+		for i := 1; i <= 10; i++ {
+			orbit, err := generateOrbit(ts)
+			if err != nil {
+				return nil, err
+			}
+			s.Orbits[i] = orbit
+		}
+		return &s, nil
 	}
-	srv.Handler = routes(srv, http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)), cfg.Games.FileSavePath)
-
-	log.Printf("[server] listening on %s\n", srv.Addr)
-	return srv.ListenAndServe()
 }

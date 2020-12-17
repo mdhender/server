@@ -14,24 +14,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+package orbits
 
 import (
-	"github.com/mdhender/server/pkg/handlers/spa"
-	"log"
-	"net/http"
+	"github.com/google/uuid"
+	"github.com/mdhender/server/pkg/planets"
+	"github.com/mdhender/server/pkg/prng"
 )
 
-func run(cfg *config) error {
-	var options []func(*server) error
-	options = append(options, setSalt(cfg.Server.Salt))
+type Generator func(generator prng.Generator) (*Orbit, error)
 
-	srv, err := newServer(cfg, options...)
-	if err != nil {
-		return err
+// DefaultGenerator returns a generator with the following rules:
+//   75% chance orbit contains a planet
+func DefaultGenerator() Generator {
+	generatePlanet := planets.DefaultGenerator()
+	return func(ts prng.Generator) (*Orbit, error) {
+		var o Orbit
+		o.ID = uuid.New().String()
+		if ts.Intn(4) == 0 {
+			// we're creating an empty orbit to give ships and colonies something to park in.
+		} else {
+			// we're creating a planet or asteroid belt in this orbit
+			p, err := generatePlanet(ts)
+			if err != nil {
+				return nil, err
+			}
+			o.Planet = p
+		}
+		return &o, nil
 	}
-	srv.Handler = routes(srv, http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)), cfg.Games.FileSavePath)
-
-	log.Printf("[server] listening on %s\n", srv.Addr)
-	return srv.ListenAndServe()
 }

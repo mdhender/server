@@ -17,71 +17,33 @@
 package main
 
 import (
-	"fmt"
-	engine "github.com/mdhender/server"
-	"github.com/mdhender/server/pkg/jsonapi"
 	"github.com/mdhender/server/pkg/way"
-	"log"
 	"net/http"
 )
 
-func routes(s *server) http.Handler {
+func routes(s *server, spa http.Handler, gameFileSavePath string) http.Handler {
 	router := way.NewRouter()
 
-	router.Handle("POST", "/api/orders", s.postOrders())
-	router.Handle("POST", "/api/turn", s.postTurn())
+	router.Handle("GET", "/api/games", s.getAllGames())
+	router.Handle("GET", "/api/games/:id", s.getGame())
+	router.Handle("GET", "/api/games/:id/players", s.getGamePlayers())
+	router.Handle("GET", "/api/games/:id/players/:playerName", s.getGamePlayer())
+	router.Handle("GET", "/api/games/:id/players/:playerName/printout", s.getGamePlayerPrintout())
+	router.Handle("GET", "/api/games/:id/systems", s.getGameSystems())
+	router.Handle("GET", "/api/games/:id/systems/:systemId", s.getGameSystem())
+	router.Handle("GET", "/api/users", s.getAllUsers())
+	router.Handle("GET", "/api/users/:id", s.getUser())
+	router.Handle("GET", "/api/version", s.getVersion())
+
+	router.Handle("POST", "/api/engine/restart", s.restart())
+	router.Handle("POST", "/api/games", s.addGame())
+	router.Handle("POST", "/api/games/:id/orders", s.postGameOrders())
+	router.Handle("POST", "/api/games/:id/save", s.postGameSave(gameFileSavePath))
+	router.Handle("POST", "/api/users", s.addUser())
+
+	// assume that all other routes are to serve the front end application
+	router.NotFound = spa
 
 	return router
 }
 
-// postOrders .
-func (s *server) postOrders() http.HandlerFunc {
-	type response struct {
-		Message string `json:"msg"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Enforce a maximum read of 1MB from the request body.
-		orders, errs := engine.Decode(http.MaxBytesReader(w, r.Body, 1<<20))
-		if errs != nil {
-			for _, err := range errs {
-				log.Printf("[orders] %+v\n", err)
-			}
-			jsonapi.Error(w, r, http.StatusBadRequest, errs[0])
-			return
-		}
-		log.Printf("[orders] %d %v\n", orders.Len(), orders)
-
-		// do something with the orders
-		var e engine.State
-		if err := e.PostOrders(orders); err != nil {
-			jsonapi.Error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		jsonapi.Ok(w, r, http.StatusOK, response{"order accepted"})
-	}
-}
-
-// postTurn .
-func (s *server) postTurn() http.HandlerFunc {
-	type response struct {
-		TurnNo  int      `json:"turn"`
-		Message string   `json:"msg"`
-		Errors  []string `json:"errors,omitempty"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		if len(s.turns) == 0 {
-			jsonapi.Error(w, r, http.StatusBadRequest, fmt.Errorf("no turns to process"))
-			return
-		}
-		if err := s.process(len(s.turns), s.turns[len(s.turns)-1]); err != nil {
-			jsonapi.Error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-		jsonapi.Ok(w, r, http.StatusOK, response{TurnNo: len(s.turns), Message: "turn completed"})
-	}
-}
-
-func (s *server) process(turnNo int, orders engine.Orders) error {
-	return fmt.Errorf("server.process not implemented")
-}
