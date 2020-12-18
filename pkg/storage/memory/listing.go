@@ -26,7 +26,7 @@ import (
 // GetGame returns a listing of a game if the caller is authorized to list that game.
 // If the caller is not authorized or the game does not exist, it returns the not found error.
 func (m *Store) GetGame(a *auth.Authorization, id string) (listing.Game, error) {
-	isAuthorized := a.HasRole("admin") || a.ID == id
+	isAuthorized := a.HasRole("admin")
 	if isAuthorized {
 		if game, ok := m.games.id[id]; ok {
 			return listing.Game{
@@ -36,6 +36,45 @@ func (m *Store) GetGame(a *auth.Authorization, id string) (listing.Game, error) 
 		}
 	}
 	return listing.Game{}, listing.ErrGameNotFound
+}
+
+// GetGamePlayer returns data for a player in a game.
+// If the caller is not authorized or the game/player does not exist, it returns the not found error.
+func (m *Store) GetGamePlayer(a *auth.Authorization, id, name string) (listing.Player, error) {
+	isAuthorized := a.HasRole("admin")
+	if isAuthorized {
+		if game, ok := m.games.id[id]; ok {
+			for _, player := range game.players {
+				if player.name == name {
+					return listing.Player{
+						Name:     player.name,
+						UserName: player.user,
+					}, nil
+				}
+			}
+			return listing.Player{}, listing.ErrPlayerNotFound
+		}
+	}
+	return listing.Player{}, listing.ErrGameNotFound
+}
+
+// GetGamePlayers returns data for all players in a game.
+// If the caller is not authorized or the game/player does not exist, it returns the not found error.
+func (m *Store) GetGamePlayers(a *auth.Authorization, id string) ([]listing.Player, error) {
+	var list []listing.Player = []listing.Player{}
+	isAuthorized := a.HasRole("admin")
+	if isAuthorized {
+		if game, ok := m.games.id[id]; ok {
+			for _, player := range game.players {
+				list = append(list, listing.Player{
+					Name:     player.name,
+					UserName: player.user,
+				})
+			}
+			return list, nil
+		}
+	}
+	return list, listing.ErrGameNotFound
 }
 
 // GetGames returns a listing of games that the call is authorized to list.

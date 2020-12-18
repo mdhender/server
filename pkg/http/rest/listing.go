@@ -40,14 +40,70 @@ func GetGame(ls listing.Service) http.HandlerFunc {
 		id := way.Param(r.Context(), "id")
 		game, err := ls.GetGame(a, id)
 		if err != nil {
-			if errors.Is(err, listing.ErrUserNotFound) {
-				jsonapi.Error(w, r, http.StatusNotFound, listing.ErrGameNotFound)
+			if errors.Is(err, listing.ErrGameNotFound) {
+				jsonapi.Error(w, r, http.StatusNotFound, err)
 				return
 			}
 			jsonapi.Error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 		jsonapi.Ok(w, r, http.StatusOK, okResult{game.ID, game.Name})
+	}
+}
+
+// GetGamePlayer returns details for a player in specific game
+func GetGamePlayer(ls listing.Service) http.HandlerFunc {
+	type okResult struct {
+		Name string `json:"name"`
+	}
+
+	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := way.Param(r.Context(), "id")
+		name := way.Param(r.Context(), "player_name")
+		player, err := ls.GetGamePlayer(a, id, name)
+		if err != nil {
+			if errors.Is(err, listing.ErrGameNotFound) || errors.Is(err, listing.ErrPlayerNotFound) {
+				jsonapi.Error(w, r, http.StatusNotFound, err)
+				return
+			}
+			jsonapi.Error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		jsonapi.Ok(w, r, http.StatusOK, okResult{player.Name})
+	}
+}
+
+// GetGamePlayers returns all the players specific game
+func GetGamePlayers(ls listing.Service) http.HandlerFunc {
+	type detail struct {
+		Name string `json:"name"`
+	}
+	type okResult []detail
+
+	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := way.Param(r.Context(), "id")
+		players, err := ls.GetGamePlayers(a, id)
+		if err != nil {
+			if errors.Is(err, listing.ErrGameNotFound) {
+				jsonapi.Error(w, r, http.StatusNotFound, err)
+				return
+			}
+			jsonapi.Error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		var list okResult = []detail{} // create an empty list since we never return nil
+		for _, player := range players {
+			list = append(list, detail{
+				Name: player.Name,
+			})
+		}
+		jsonapi.Ok(w, r, http.StatusOK, list)
 	}
 }
 
@@ -95,7 +151,7 @@ func GetUser(ls listing.Service) http.HandlerFunc {
 		user, err := ls.GetUser(a, id)
 		if err != nil {
 			if errors.Is(err, listing.ErrUserNotFound) {
-				jsonapi.Error(w, r, http.StatusNotFound, listing.ErrUserNotFound)
+				jsonapi.Error(w, r, http.StatusNotFound, err)
 				return
 			}
 			jsonapi.Error(w, r, http.StatusInternalServerError, err)

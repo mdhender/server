@@ -25,6 +25,8 @@ import (
 // Repository defines requirements for fetching data.
 type Repository interface {
 	GetGame(a *auth.Authorization, id string) (Game, error)
+	GetGamePlayer(a *auth.Authorization, id string, name string) (Player, error)
+	GetGamePlayers(a *auth.Authorization, id string) ([]Player, error)
 	GetGames(a *auth.Authorization, ids ...string) []Game
 
 	GetUser(a *auth.Authorization, id string) (User, error)
@@ -34,6 +36,8 @@ type Repository interface {
 // Service provides listing operations.
 type Service interface {
 	GetGame(a *auth.Authorization, id string) (Game, error)
+	GetGamePlayer(a *auth.Authorization, id string, name string) (Player, error)
+	GetGamePlayers(a *auth.Authorization, id string) ([]Player, error)
 	GetGames(a *auth.Authorization, ids ...string) []Game
 
 	GetUser(a *auth.Authorization, id string) (User, error)
@@ -44,6 +48,12 @@ type Service interface {
 type Game struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// Player defines the properties of a player.
+type Player struct {
+	Name     string `json:"id"`
+	UserName string `json:"user_name"`
 }
 
 // User defines the properties of a user.
@@ -68,6 +78,18 @@ func (s *service) GetGame(a *auth.Authorization, id string) (Game, error) {
 	return s.r.GetGame(a, id)
 }
 
+// GetGamePlayer returns details for a player in a specific game.
+// Returns not found if the entity isn't authorized to list the game or it does not exist.
+func (s *service) GetGamePlayer(a *auth.Authorization, id string, name string) (Player, error) {
+	return s.r.GetGamePlayer(a, id, name)
+}
+
+// GetGamePlayers returns all the players in a specific game that the entity is authorized to list.
+// Returns not found if the entity isn't authorized to list the game or it does not exist.
+func (s *service) GetGamePlayers(a *auth.Authorization, id string) ([]Player, error) {
+	return s.r.GetGamePlayers(a, id)
+}
+
 // GetGames returns all games that the entity is authorized to list.
 // It never returns an error or a nil list.
 func (s *service) GetGames(a *auth.Authorization, ids ...string) []Game {
@@ -89,6 +111,11 @@ func (s *service) GetUsers(a *auth.Authorization, ids ...string) []User {
 // Note that this could be because the game doesn't exist or the entity making
 // the request is not authorized to list the game.
 var ErrGameNotFound = errors.New("game not found")
+
+// ErrPlayerNotFound is used when the player is not found.
+// Note that this could be because the player doesn't exist or the entity making
+// the request is not authorized to list the player.
+var ErrPlayerNotFound = errors.New("player not found")
 
 // ErrUserNotFound is used when the user is not found.
 // Note that this could be because the user doesn't exist or the entity making
