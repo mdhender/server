@@ -1,6 +1,28 @@
 # server
 A simple game server
 
+# TODO
+1. Pull todo-list from the code comments
+1. Actions to create
+    1. Users
+    1. Games
+1. Actions to list
+    1. Users
+    1. Games
+    1. Players
+    1. Systems
+    1. Diplomacy (in game messages)
+1. Actions to support reports
+    1. Turn Printout
+1. Actions to support orders
+    1. Draft orders
+        1. Upload and check for errors
+        1. Nice to have it process and send a report on the outcome in DRAFT mode
+    1. Process orders
+        1. Combine all players orders
+1. Sigh and contemplate adding a database on the backend
+
+
 # State
 State keeps data in memory, saving it to a JSON file as needed.
 
