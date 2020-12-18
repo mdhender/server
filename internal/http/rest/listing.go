@@ -213,6 +213,7 @@ func GetVersion(ls listing.Service) http.HandlerFunc {
 		Patch      int    `json:"patch"`
 		PreRelease string `json:"pre_release,omitempty"`
 		Build      string `json:"build,omitempty"`
+		SemVerURL  string `json:"semver_url"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		v := ls.GetVersion()
@@ -223,6 +224,7 @@ func GetVersion(ls listing.Service) http.HandlerFunc {
 			Patch:      v.Patch,
 			PreRelease: v.PreRelease,
 			Build:      v.Build,
+			SemVerURL:  "https://semver.org/",
 		})
 	}
 }
