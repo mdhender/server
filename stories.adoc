@@ -1,0 +1,96 @@
+== Actors
+
+Administrator::
+An Administrator (Admin for short) is a User who is responsible
+for managing the server and data.
+Administrators are distinguished from other Users by being members
+of the "admin" role.
+
+User::
+A User is a person who has an account.
+Roles are assigned to Users when their accounts are created.
+
+Game Manager::
+A Game Manager (GM for short) is a User that is allowed to create
+new games, manage Players, and modify details of units in the game.
+The GM has almost unlimited access to the games she manages.
+The GM can view all of the players and units in the game.
+
+Player::
+A Player is a User who has joined a game.
+Player names are unique within a single game, but can be duplicated
+between games.
+
+== Things
+
+Game::
+A Game consists of a set of Players along with the data that defines
+the systems, planets, and other units controlled (owned?) by the
+Players.
+
+Race::
+A Race in the Game is a group of people originating from the same
+planet in a system.
+Each Race is controlled by a single Player.
+Races can be divided into tribes or nations, but this implmentation
+treats them as a single entity.
+
+Order::
+An order is a command from a Player to change the state of something
+in the Game.
+Examples are moving a ship to a different system, sending a message
+to another race, a colony taking up a defensive posture, or a factor
+manufacturing space engines.
+
+Unit::
+A Unit in the Game is anything that can be ordered to take some action
+by a Player.
+Units are controlled ("owned") by a single Player.
+
+Independent Units::
+Units that are not controlled by any Player are "independent."
+It would wonderful if they could be scripted in the future to be
+like AI.
+For now, they just tend to keep on doing whatever they were doing
+when they were last controlled by a Player.
+
+== Use Cases
+
+In order to create a secure application as an ADMINISTRATOR, I can
+configure the application using environment variables and a simple
+JSON file.
+
+In order to allow access by authorized users only as an ADMINISTRATOR,
+I can add a USER.
+
+In order to prevent misuse of the application as an ADMINISTRATOR,
+I can manage the roles assigned to a USER.
+
+In order to create games as an ADMINISTRATOR, I can manage the set
+of USERS that are GAMEMANAGERS.
+
+In order to create a new game as a GAMEMANAGER, I can create a new
+game.
+
+As a USER, I need to find games that are available to join in order
+to decide which games I will participate in.
+
+As a USER, I need to join games in order to participate as a PLAYER
+in a game.
+
+As a PLAYER, I need to find a list of all the units I control in
+order to .
+
+As a PLAYER, I need to find the current status of all the units
+I control.
+
+As a PLAYER, I need to find the current status of a specific unit
+I control.
+
+As a PLAYER, I need to provide orders to units I control.
+
+As a PLAYER, I need to submit orders for a turn in order to have
+the game process my orders.
+
+== Features
+
