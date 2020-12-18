@@ -18,7 +18,7 @@ package creating
 
 import (
 	"errors"
-	"github.com/mdhender/server/pkg/auth"
+	"github.com/mdhender/server/internal/auth"
 )
 
 // Repository defines requirements for creating data.

@@ -19,7 +19,7 @@ package rest
 import (
 	"encoding/json"
 	"errors"
-	"github.com/mdhender/server/pkg/auth"
+	"github.com/mdhender/server/internal/auth"
 	"github.com/mdhender/server/pkg/jsonapi"
 	"github.com/mdhender/server/pkg/listing"
 	"github.com/mdhender/server/pkg/way"

@@ -18,7 +18,7 @@ package memory
 
 import (
 	"github.com/google/uuid"
-	"github.com/mdhender/server/pkg/auth"
+	"github.com/mdhender/server/internal/auth"
 	"github.com/mdhender/server/pkg/creating"
 	"strings"
 )

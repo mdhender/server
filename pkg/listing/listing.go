@@ -18,7 +18,7 @@ package listing
 
 import (
 	"errors"
-	"github.com/mdhender/server/pkg/auth"
+	"github.com/mdhender/server/internal/auth"
 	"time"
 )
 

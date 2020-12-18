@@ -17,7 +17,7 @@
 package memory
 
 import (
-	"github.com/mdhender/server/pkg/auth"
+	"github.com/mdhender/server/internal/auth"
 	"github.com/mdhender/server/pkg/listing"
 )
 
