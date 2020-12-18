@@ -14,40 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+package memory
 
 import (
-	"github.com/mdhender/server/pkg/handlers/spa"
-	"github.com/mdhender/server/pkg/storage/memory"
-	"log"
-	"net/http"
+	"github.com/mdhender/server/pkg/auth"
+	"github.com/mdhender/server/pkg/creating"
 )
 
-func run(cfg *config) error {
-	rc := routeConfig{
-		gameFileSavePath: cfg.Games.FileSavePath,
-		notFound:         http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)),
-	}
-
-	ds, err := memory.New()
-	if err != nil {
-		return err
-	}
-	if cfg.MockData {
-		ds.MockData()
-	}
-	rc.services.creating = ds
-	rc.services.listing = ds
-
-	var options []func(*server) error
-	options = append(options, setSalt(cfg.Server.Salt))
-
-	srv, err := newServer(cfg, options...)
-	if err != nil {
-		return err
-	}
-	srv.Handler = routes(srv, rc)
-
-	log.Printf("[server] listening on %s\n", srv.Addr)
-	return srv.ListenAndServe()
+func (m *Store) CreateUser(a *auth.Authorization, nu creating.NewUser) (creating.User, error) {
+	panic("implement me")
 }

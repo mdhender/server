@@ -17,6 +17,7 @@
 package main
 
 import (
+	"github.com/mdhender/server/pkg/creating"
 	"github.com/mdhender/server/pkg/http/rest"
 	"github.com/mdhender/server/pkg/listing"
 	"github.com/mdhender/server/pkg/way"
@@ -41,7 +42,7 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("POST", "/api/games", s.addGame())
 	router.Handle("POST", "/api/games/:id/orders", s.postGameOrders())
 	router.Handle("POST", "/api/games/:id/save", s.postGameSave(rc.gameFileSavePath))
-	router.Handle("POST", "/api/users", s.addUser())
+	router.Handle("POST", "/api/users", rest.CreateUser(rc.services.creating))
 
 	// assume that all other routes are to serve the front end application
 	router.NotFound = rc.notFound
@@ -53,6 +54,7 @@ type routeConfig struct {
 	gameFileSavePath string
 	notFound         http.Handler
 	services         struct {
-		listing listing.Service
+		creating creating.Service
+		listing  listing.Service
 	}
 }
