@@ -205,3 +205,24 @@ func GetUsers(ls listing.Service) http.HandlerFunc {
 		jsonapi.Ok(w, r, http.StatusOK, list)
 	}
 }
+
+func GetVersion(ls listing.Service) http.HandlerFunc {
+	type okResult struct {
+		Major      int    `json:"major"`
+		Minor      int    `json:"minor"`
+		Patch      int    `json:"patch"`
+		PreRelease string `json:"pre_release,omitempty"`
+		Build      string `json:"build,omitempty"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		v := ls.GetVersion()
+
+		jsonapi.Ok(w, r, http.StatusOK, okResult{
+			Major:      v.Major,
+			Minor:      v.Minor,
+			Patch:      v.Patch,
+			PreRelease: v.PreRelease,
+			Build:      v.Build,
+		})
+	}
+}

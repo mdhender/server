@@ -36,7 +36,7 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("GET", "/api/games/:id/systems/:systemId", s.getGameSystem())
 	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.listing))
 	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.listing))
-	router.Handle("GET", "/api/version", s.getVersion())
+	router.Handle("GET", "/api/version", rest.GetVersion(rc.services.listing))
 
 	router.Handle("POST", "/api/engine/restart", s.restart())
 	router.Handle("POST", "/api/games", s.addGame())

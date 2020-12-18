@@ -166,3 +166,13 @@ func (m *Store) GetUsers(a *auth.Authorization, ids ...string) []listing.User {
 	}
 	return list
 }
+
+func (m *Store) GetVersion() listing.Version {
+	return listing.Version{
+		Major:      m.version.major,
+		Minor:      m.version.minor,
+		Patch:      m.version.patch,
+		PreRelease: m.version.preRelease,
+		Build:      m.version.build,
+	}
+}

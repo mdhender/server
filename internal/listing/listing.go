@@ -33,6 +33,11 @@ type Repository interface {
 	GetUsers(a *auth.Authorization, ids ...string) []User
 }
 
+// VersionRepository defines requirements for fetching version information.
+type VersionRepository interface {
+	GetVersion() Version
+}
+
 // Service provides listing operations.
 type Service interface {
 	GetGame(a *auth.Authorization, id string) (Game, error)
@@ -42,6 +47,8 @@ type Service interface {
 
 	GetUser(a *auth.Authorization, id string) (User, error)
 	GetUsers(a *auth.Authorization, ids ...string) []User
+
+	GetVersion() Version
 }
 
 // Game defines the properties of a game.
@@ -64,13 +71,23 @@ type User struct {
 	Created time.Time `json:"created"`
 }
 
+// Version defines the properties of a version.
+type Version struct {
+	Major      int
+	Minor      int
+	Patch      int
+	PreRelease string
+	Build      string
+}
+
 type service struct {
-	r Repository
+	r  Repository
+	vr VersionRepository
 }
 
 // NewService creates a listing service with the necessary dependencies
-func NewService(r Repository) Service {
-	return &service{r: r}
+func NewService(r Repository, vr VersionRepository) Service {
+	return &service{r: r, vr: vr}
 }
 
 // GetGame returns a specific game if the entity is authorized to list that game.
@@ -105,6 +122,12 @@ func (s *service) GetUser(a *auth.Authorization, id string) (User, error) {
 // It never returns an error or a nil list.
 func (s *service) GetUsers(a *auth.Authorization, ids ...string) []User {
 	return s.r.GetUsers(a, ids...)
+}
+
+// GetVersion returns the version of the game engine.
+// That may be meaningless?
+func (s *service) GetVersion() Version {
+	return s.vr.GetVersion()
 }
 
 // ErrGameNotFound is used when the game is not found.

@@ -21,11 +21,14 @@ import "sync"
 
 func New() (*Store, error) {
 	m := &Store{}
+
 	m.games.id = make(map[string]*game)
 	m.games.name = make(map[string]string)
 	m.users.id = make(map[string]*user)
 	m.users.email = make(map[string]string)
 	m.users.name = make(map[string]string)
+	m.version = version{}
+
 	return m, nil
 }
 
@@ -45,4 +48,5 @@ type Store struct {
 		// name is a map from user name to user id
 		name map[string]string
 	}
+	version version
 }

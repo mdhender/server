@@ -45,3 +45,11 @@ type user struct {
 	roles   []string
 	created time.Time
 }
+
+type version struct {
+	major      int
+	minor      int
+	patch      int
+	preRelease string
+	build      string
+}
