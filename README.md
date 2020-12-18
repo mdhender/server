@@ -22,6 +22,9 @@ A simple game server
         1. Combine all players orders
 1. Sigh and contemplate adding a database on the backend
 
+# Discussions
+The "discussion" tab is activated on Github.
+I think that it's open to anyone with an account on Github.
 
 # State
 State keeps data in memory, saving it to a JSON file as needed.
