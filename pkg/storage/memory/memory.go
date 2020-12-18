@@ -17,11 +17,14 @@
 // Package memory implements in-memory data storage.
 package memory
 
+import "sync"
+
 func New() (*Store, error) {
 	m := &Store{}
 	m.games.id = make(map[string]*game)
 	m.games.name = make(map[string]string)
 	m.users.id = make(map[string]*user)
+	m.users.email = make(map[string]string)
 	m.users.name = make(map[string]string)
 	return m, nil
 }
@@ -34,8 +37,11 @@ type Store struct {
 		name map[string]string
 	}
 	users struct {
+		sync.RWMutex
 		// id is a map from user id to user properties
 		id map[string]*user
+		// email is a map from user email to user id
+		email map[string]string
 		// name is a map from user name to user id
 		name map[string]string
 	}

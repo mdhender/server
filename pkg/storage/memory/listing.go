@@ -26,8 +26,8 @@ import (
 // GetGame returns a listing of a game if the caller is authorized to list that game.
 // If the caller is not authorized or the game does not exist, it returns the not found error.
 func (m *Store) GetGame(a *auth.Authorization, id string) (listing.Game, error) {
-	isAuthorized := a.HasRole("admin")
-	if isAuthorized {
+	isAdmin := a.HasRole("admin")
+	if isAdmin {
 		if game, ok := m.games.id[id]; ok {
 			return listing.Game{
 				ID:   game.id,
@@ -41,8 +41,8 @@ func (m *Store) GetGame(a *auth.Authorization, id string) (listing.Game, error) 
 // GetGamePlayer returns data for a player in a game.
 // If the caller is not authorized or the game/player does not exist, it returns the not found error.
 func (m *Store) GetGamePlayer(a *auth.Authorization, id, name string) (listing.Player, error) {
-	isAuthorized := a.HasRole("admin")
-	if isAuthorized {
+	isAdmin := a.HasRole("admin")
+	if isAdmin {
 		if game, ok := m.games.id[id]; ok {
 			for _, player := range game.players {
 				if player.name == name {
@@ -62,8 +62,8 @@ func (m *Store) GetGamePlayer(a *auth.Authorization, id, name string) (listing.P
 // If the caller is not authorized or the game/player does not exist, it returns the not found error.
 func (m *Store) GetGamePlayers(a *auth.Authorization, id string) ([]listing.Player, error) {
 	var list []listing.Player = []listing.Player{}
-	isAuthorized := a.HasRole("admin")
-	if isAuthorized {
+	isAdmin := a.HasRole("admin")
+	if isAdmin {
 		if game, ok := m.games.id[id]; ok {
 			for _, player := range game.players {
 				list = append(list, listing.Player{
@@ -114,7 +114,8 @@ func (m *Store) GetGames(a *auth.Authorization, ids ...string) []listing.Game {
 // GetUser returns a listing of a user if the caller is authorized to list that user.
 // If the caller is not authorized or the user does not exist, it returns the not found error.
 func (m *Store) GetUser(a *auth.Authorization, id string) (listing.User, error) {
-	isAuthorized := a.HasRole("admin") || a.ID == id
+	isAdmin := a.HasRole("admin")
+	isAuthorized := isAdmin || a.ID == id
 	if isAuthorized {
 		if user, ok := m.users.id[id]; ok {
 			return listing.User{

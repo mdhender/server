@@ -17,6 +17,7 @@
 package creating
 
 import (
+	"errors"
 	"github.com/mdhender/server/pkg/auth"
 )
 
@@ -32,6 +33,7 @@ type Service interface {
 
 // NewUser defines the properties of a user to create.
 type NewUser struct {
+	ID    string `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
@@ -55,3 +57,24 @@ func NewService(r Repository) Service {
 func (s *service) CreateUser(a *auth.Authorization, nu NewUser) (User, error) {
 	return s.r.CreateUser(a, nu)
 }
+
+// ErrDuplicateEmail is used when the e-mail address is not unique.
+var ErrDuplicateEmail = errors.New("duplicate e-mail address")
+
+// ErrDuplicateID is used when the id is not unique.
+var ErrDuplicateID = errors.New("duplicate id")
+
+// ErrDuplicateName is used when the user name is not unique.
+var ErrDuplicateName = errors.New("duplicate user name")
+
+// ErrInvalidEmail is used when the email is not valid.
+var ErrInvalidEmail = errors.New("invalid e-mail address")
+
+// ErrInvalidID is used when the id is not valid.
+var ErrInvalidID = errors.New("invalid id")
+
+// ErrInvalidName is used when the name is not valid.
+var ErrInvalidName = errors.New("invalid name")
+
+// ErrUnauthorized is used when the caller does not have the role needed for an action.
+var ErrUnauthorized = errors.New("unauthorized")

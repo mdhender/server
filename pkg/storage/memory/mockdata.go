@@ -32,6 +32,7 @@ func (m *Store) MockData() {
 		created: time.Now(),
 	}
 	m.users.id[usagi.id] = usagi
+	m.users.email[usagi.email] = usagi.id
 	m.users.name[usagi.name] = usagi.id
 
 	yōjinbō := &user{
@@ -42,6 +43,7 @@ func (m *Store) MockData() {
 		created: time.Now(),
 	}
 	m.users.id[yōjinbō.id] = yōjinbō
+	m.users.email[yōjinbō.email] = yōjinbō.id
 	m.users.name[yōjinbō.name] = yōjinbō.id
 
 	// game named Musha Shugyō

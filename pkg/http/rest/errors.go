@@ -14,24 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package memory
-
-import "errors"
-
-// ErrDuplicateAddress is used when the e-mail address is not unique.
-var ErrDuplicateAddress = errors.New("duplicate e-mail address")
-
-// ErrDuplicateID is used when the id is not unique.
-var ErrDuplicateID = errors.New("duplicate id")
-
-// ErrDuplicateName is used when the user name is not unique.
-var ErrDuplicateName = errors.New("duplicate user name")
-
-// ErrInvalidEmail is used when the email is not valid.
-var ErrInvalidEmail = errors.New("invalid e-mail")
-
-// ErrInvalidID is used when the id is not valid.
-var ErrInvalidID = errors.New("invalid id")
-
-// ErrInvalidName is used when the name is not valid.
-var ErrInvalidName = errors.New("invalid name")
+package rest
