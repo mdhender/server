@@ -14,33 +14,39 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package orbits
+package systems
 
 import (
+	"fmt"
 	"github.com/google/uuid"
-	"github.com/mdhender/server/pkg/planets"
-	"github.com/mdhender/server/pkg/prng"
+	"github.com/mdhender/server/internal/prng"
+	"github.com/mdhender/server/internal/stars"
 )
 
-type Generator func(generator prng.Generator) (*Orbit, error)
+type Generator func(ts prng.Generator) (*System, error)
 
 // DefaultGenerator returns a generator with the following rules:
-//   75% chance orbit contains a planet
+//   from 1 to 10 orbits
+//   each orbit after the first has a 95% chance of containing a planet
+//   if an orbit is empty, all remaining orbits are also empty
 func DefaultGenerator() Generator {
-	generatePlanet := planets.DefaultGenerator()
-	return func(ts prng.Generator) (*Orbit, error) {
-		var o Orbit
-		o.ID = uuid.New().String()
-		if ts.Intn(4) == 0 {
-			// we're creating an empty orbit to give ships and colonies something to park in.
-		} else {
-			// we're creating a planet or asteroid belt in this orbit
-			p, err := generatePlanet(ts)
-			if err != nil {
-				return nil, err
-			}
-			o.Planet = p
+	generateStar := stars.DefaultGenerator()
+	return func(ts prng.Generator) (*System, error) {
+		var s System
+		s.ID = uuid.New().String()
+
+		minXYZ, maxXYZ := 0, 30
+		s.X = minXYZ + ts.Intn(maxXYZ-minXYZ)
+		s.Y = minXYZ + ts.Intn(maxXYZ-minXYZ)
+		s.Z = minXYZ + ts.Intn(maxXYZ-minXYZ)
+
+		s.Name = fmt.Sprintf("%02d-%02d-%02d", s.X, s.Y, s.Z)
+		star, err := generateStar(ts)
+		if err != nil {
+			return nil, err
 		}
-		return &o, nil
+		star.Name = s.Name
+		s.Stars = append(s.Stars, star)
+		return &s, nil
 	}
 }

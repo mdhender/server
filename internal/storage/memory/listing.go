@@ -18,7 +18,7 @@ package memory
 
 import (
 	"github.com/mdhender/server/internal/auth"
-	"github.com/mdhender/server/pkg/listing"
+	"github.com/mdhender/server/internal/listing"
 )
 
 // This file implements the listing.Repository interface

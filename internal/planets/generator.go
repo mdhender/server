@@ -17,8 +17,8 @@
 package planets
 
 import (
-	"github.com/mdhender/server/pkg/prng"
-	"github.com/mdhender/server/pkg/resources"
+	"github.com/mdhender/server/internal/prng"
+	"github.com/mdhender/server/internal/resources"
 	"log"
 )
 

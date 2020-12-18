@@ -14,13 +14,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package orbits
+package systems
 
-import (
-	"github.com/mdhender/server/pkg/planets"
-)
+import "github.com/mdhender/server/internal/stars"
 
-type Orbit struct {
-	ID     string          `json:"orbit_id"`
-	Planet *planets.Planet `json:"planet,omitempty"`
+type System struct {
+	ID    string        `json:"system_id"`
+	Name  string        `json:"name"`
+	X     int           `json:"x"`
+	Y     int           `json:"y"`
+	Z     int           `json:"z"`
+	Stars []*stars.Star `json:"stars,omitempty"`
 }

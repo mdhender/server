@@ -17,7 +17,7 @@
 package games
 
 import (
-	"github.com/mdhender/server/pkg/orders"
+	"github.com/mdhender/server/internal/orders"
 	"log"
 )
 

@@ -14,29 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package tribes
+package orbits
 
 import (
-	"encoding/json"
-	"github.com/mdhender/server/pkg/planets"
-	"github.com/mdhender/server/pkg/systems"
+	"github.com/mdhender/server/internal/planets"
 )
 
-type Tribe struct {
-	Name       string          `json:"name"`        // name of the tribe
-	HomeSystem *systems.System `json:"home_system"` // tribe's home system
-	HomeWorld  *planets.Planet `json:"home_world"`  // tribe's home world
-}
-
-func (t *Tribe) MarshalJSON() ([]byte, error) {
-	data := struct {
-		Name       string `json:"name"`
-		HomeSystem string `json:"home_system"`
-		HomeWorld  string `json:"home_world"`
-	}{
-		Name:       t.Name,
-		HomeSystem: t.HomeSystem.Name,
-		HomeWorld:  t.HomeWorld.ID,
-	}
-	return json.Marshal(&data)
+type Orbit struct {
+	ID     string          `json:"orbit_id"`
+	Planet *planets.Planet `json:"planet,omitempty"`
 }

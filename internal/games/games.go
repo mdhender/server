@@ -18,10 +18,10 @@ package games
 
 import (
 	"fmt"
-	"github.com/mdhender/server/pkg/planets"
-	"github.com/mdhender/server/pkg/prng"
-	"github.com/mdhender/server/pkg/systems"
-	"github.com/mdhender/server/pkg/tribes"
+	"github.com/mdhender/server/internal/planets"
+	"github.com/mdhender/server/internal/prng"
+	"github.com/mdhender/server/internal/systems"
+	"github.com/mdhender/server/internal/tribes"
 	"math/rand"
 	"time"
 )

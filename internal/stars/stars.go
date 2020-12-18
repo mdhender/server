@@ -17,7 +17,7 @@
 package stars
 
 import (
-	"github.com/mdhender/server/pkg/orbits"
+	"github.com/mdhender/server/internal/orbits"
 )
 
 // Star may be a member of a multiple-star system.

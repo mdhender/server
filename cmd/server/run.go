@@ -17,8 +17,8 @@
 package main
 
 import (
-	"github.com/mdhender/server/pkg/handlers/spa"
-	"github.com/mdhender/server/pkg/storage/memory"
+	"github.com/mdhender/server/internal/handlers/spa"
+	"github.com/mdhender/server/internal/storage/memory"
 	"log"
 	"net/http"
 )

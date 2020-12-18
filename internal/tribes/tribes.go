@@ -14,33 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package stars
+package tribes
 
 import (
-	"fmt"
-	"github.com/google/uuid"
-	"github.com/mdhender/server/pkg/orbits"
-	"github.com/mdhender/server/pkg/prng"
+	"encoding/json"
+	"github.com/mdhender/server/internal/planets"
+	"github.com/mdhender/server/internal/systems"
 )
 
-type Generator func(ts prng.Generator) (*Star, error)
+type Tribe struct {
+	Name       string          `json:"name"`        // name of the tribe
+	HomeSystem *systems.System `json:"home_system"` // tribe's home system
+	HomeWorld  *planets.Planet `json:"home_world"`  // tribe's home world
+}
 
-// DefaultGenerator returns a generator with the following rules:
-//   11 orbits
-//   Orbit[0] is treated as the "11th Orbit" in the rulebook.
-func DefaultGenerator() Generator {
-	generateOrbit := orbits.DefaultGenerator()
-	return func(ts prng.Generator) (*Star, error) {
-		var s Star
-		s.ID = uuid.New().String()
-		s.Name = fmt.Sprintf("%02d-%02d-%02d", 0, 0, 0)
-		for i := 1; i <= 10; i++ {
-			orbit, err := generateOrbit(ts)
-			if err != nil {
-				return nil, err
-			}
-			s.Orbits[i] = orbit
-		}
-		return &s, nil
+func (t *Tribe) MarshalJSON() ([]byte, error) {
+	data := struct {
+		Name       string `json:"name"`
+		HomeSystem string `json:"home_system"`
+		HomeWorld  string `json:"home_world"`
+	}{
+		Name:       t.Name,
+		HomeSystem: t.HomeSystem.Name,
+		HomeWorld:  t.HomeWorld.ID,
 	}
+	return json.Marshal(&data)
 }

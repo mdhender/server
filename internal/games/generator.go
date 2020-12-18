@@ -17,9 +17,9 @@
 package games
 
 import (
-	"github.com/mdhender/server/pkg/prng"
-	"github.com/mdhender/server/pkg/systems"
-	"github.com/mdhender/server/pkg/tribes"
+	"github.com/mdhender/server/internal/prng"
+	"github.com/mdhender/server/internal/systems"
+	"github.com/mdhender/server/internal/tribes"
 	"time"
 )
 

@@ -18,7 +18,7 @@ package resources
 
 import (
 	"github.com/google/uuid"
-	"github.com/mdhender/server/pkg/prng"
+	"github.com/mdhender/server/internal/prng"
 )
 
 type Generator func(prng.Generator) (*Resource, error)

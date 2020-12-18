@@ -19,7 +19,7 @@ package planets
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mdhender/server/pkg/resources"
+	"github.com/mdhender/server/internal/resources"
 )
 
 type Planet struct {

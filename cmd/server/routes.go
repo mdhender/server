@@ -17,10 +17,10 @@
 package main
 
 import (
+	"github.com/mdhender/server/internal/creating"
+	"github.com/mdhender/server/internal/http/rest"
+	"github.com/mdhender/server/internal/listing"
 	"github.com/mdhender/server/internal/way"
-	"github.com/mdhender/server/pkg/creating"
-	"github.com/mdhender/server/pkg/http/rest"
-	"github.com/mdhender/server/pkg/listing"
 	"net/http"
 )
 

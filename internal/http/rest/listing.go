@@ -21,8 +21,8 @@ import (
 	"errors"
 	"github.com/mdhender/server/internal/auth"
 	"github.com/mdhender/server/internal/jsonapi"
+	"github.com/mdhender/server/internal/listing"
 	"github.com/mdhender/server/internal/way"
-	"github.com/mdhender/server/pkg/listing"
 	"net/http"
 )
 

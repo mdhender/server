@@ -18,8 +18,8 @@ package gamemeta
 
 import (
 	"encoding/json"
-	"github.com/mdhender/server/pkg/games"
-	"github.com/mdhender/server/pkg/users"
+	"github.com/mdhender/server/internal/games"
+	"github.com/mdhender/server/internal/users"
 	"time"
 )
 
