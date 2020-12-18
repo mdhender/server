@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/mdhender/server/internal/auth"
-	"github.com/mdhender/server/pkg/jsonapi"
+	"github.com/mdhender/server/internal/jsonapi"
 	"github.com/mdhender/server/pkg/listing"
 	"github.com/mdhender/server/pkg/way"
 	"net/http"

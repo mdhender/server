@@ -21,8 +21,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mdhender/server/internal/auth"
+	"github.com/mdhender/server/internal/jsonapi"
 	"github.com/mdhender/server/pkg/creating"
-	"github.com/mdhender/server/pkg/jsonapi"
 	"net/http"
 )
 
