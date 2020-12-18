@@ -26,6 +26,34 @@ A simple game server
 The "discussion" tab is activated on Github.
 I think that it's open to anyone with an account on Github.
 
+# Navigating the Code
+The server tries to use [Ports and Adapters](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)) architecture. 
+That means that we define interfaces to adapt HTTP requests to Services to the Repository.
+
+To untangle this, you should start with the file `cmd/server/routes.go`.
+That shows all of the routes that the server implements.
+
+    NOTE: I'm currently in the middle of moving some concept code to
+    the ports architecture. The routes that use `rest.XXX` are ports
+    style. The routes that are `s.XXX` are from the concept code and
+    are going away.
+
+Once you've seen the routes, look at `pkg/http/rest`.
+That package implements all of the handlers that accept HTTP requests from the front-end client.
+
+The handlers in the `rest` package take `creating` or `listing` interfaces.
+Those interfaces define the functions that must be implemented by the service and repository packages.
+
+The `rest` handlers are responsible for extracting the form data from the request.
+(Eventually they'll also handle authentication, too.)
+They then pass the form data on to the service interface.
+
+The service interfaces (for example `creating.Service`) take the data and interact with the repository to create or fetch data.
+The response from the repository is formatted as needed (the `rest` package declares the response types for each handler).
+The service then returns it to the `rest` hander.
+
+Finally, the `rest` handler puts the response on the wire and sends it back to the front-end client.
+
 # State
 State keeps data in memory, saving it to a JSON file as needed.
 
