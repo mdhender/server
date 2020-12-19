@@ -17,6 +17,7 @@
 package memory
 
 import (
+	"fmt"
 	"github.com/mdhender/server/internal/auth"
 	"github.com/mdhender/server/internal/listing"
 )
@@ -72,6 +73,16 @@ func (m *Store) GetGamePlayers(a *auth.Authorization, id string) (listing.Player
 		}
 	}
 	return list, listing.ErrGameNotFound
+}
+
+// GetGameSystem returns data for a system in a game.
+func (m *Store) GetGameSystem(a *auth.Authorization, id string, name string) (listing.SystemDetail, error) {
+	return listing.SystemDetail{}, fmt.Errorf("!implemented")
+}
+
+// GetGameSystems returns a listing of all systems in a game.
+func (m *Store) GetGameSystems(a *auth.Authorization, id string) (listing.SystemList, error) {
+	return listing.SystemList{}, fmt.Errorf("!implemented")
 }
 
 // GetGames returns a listing of games that the call is authorized to list.

@@ -102,6 +102,53 @@ func GetGamePlayers(ls listing.Service) http.HandlerFunc {
 	}
 }
 
+// GetGameSystem returns a specific system in a game
+func GetGameSystem(ls listing.Service) http.HandlerFunc {
+	type okResult struct {
+		Name string `json:"name"`
+	}
+
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := way.Param(r.Context(), "id")
+		name := way.Param(r.Context(), "system_name")
+		system, err := ls.GetGameSystem(a, id, name)
+		if err != nil {
+			if errors.Is(err, listing.ErrGameNotFound) || errors.Is(err, listing.ErrSystemNotFound) {
+				jsonapi.Error(w, r, http.StatusNotFound, err)
+				return
+			}
+			jsonapi.Error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		jsonapi.Ok(w, r, http.StatusOK, okResult{system.Name})
+	}
+}
+
+// GetGameSystems returns a list of all systems in a game
+func GetGameSystems(ls listing.Service) http.HandlerFunc {
+	type okResult []string
+
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := way.Param(r.Context(), "id")
+		_, err := ls.GetGameSystems(a, id)
+		if err != nil {
+			if errors.Is(err, listing.ErrGameNotFound) {
+				jsonapi.Error(w, r, http.StatusNotFound, err)
+				return
+			}
+			jsonapi.Error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		jsonapi.Ok(w, r, http.StatusOK, okResult{})
+	}
+}
+
 // GetGames returns all games
 func GetGames(ls listing.Service) http.HandlerFunc {
 	type detail struct {

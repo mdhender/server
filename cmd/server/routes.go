@@ -34,9 +34,8 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("GET", "/api/games/:id/players/:player_name", rest.GetGamePlayer(rc.services.listing))
 	router.Handle("GET", "/api/games/:id/players/:player_name/print-out", rest.GetGamePlayerPrintout(rc.services.reporting))
 	router.Handle("GET", "/api/games/:id/players/:player_name/print-out/turn/:turn_number", rest.GetGamePlayerPrintout(rc.services.reporting))
-
-	router.Handle("GET", "/api/games/:id/systems", s.getGameSystems())
-	router.Handle("GET", "/api/games/:id/systems/:systemId", s.getGameSystem())
+	router.Handle("GET", "/api/games/:id/systems", rest.GetGameSystems(rc.services.listing))
+	router.Handle("GET", "/api/games/:id/systems/:system_name", rest.GetGameSystem(rc.services.listing))
 
 	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.listing))
 	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.listing))
