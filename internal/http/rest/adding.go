@@ -20,13 +20,46 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/mdhender/server/internal/adding"
 	"github.com/mdhender/server/internal/auth"
-	"github.com/mdhender/server/internal/creating"
 	"github.com/mdhender/server/internal/jsonapi"
 	"net/http"
 )
 
-func CreateUser(cr creating.Service) http.HandlerFunc {
+func AddGame(as adding.Service) http.HandlerFunc {
+	type okResult struct {
+		ID string `json:"id"`
+	}
+	type formData struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+
+	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		// enforce Content-Type: application/json; charset=utf-8
+		if ct := r.Header.Get("Content-Type"); ct != "application/json; charset=utf-8" {
+			jsonapi.Error(w, r, http.StatusBadRequest, fmt.Errorf("content-type expected %q: got %q", "application/json; charset=utf-8", ct))
+			return
+		}
+
+		// enforce a maximum read of 1MB (2^20 bytes) from the request body.
+		dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
+		dec.DisallowUnknownFields() // reject any request with unknown verbs.
+
+		var input formData
+		if err := dec.Decode(&input); err != nil {
+			jsonapi.Error(w, r, http.StatusBadRequest, fmt.Errorf("bad json %w", err))
+			return
+		}
+
+		jsonapi.Error(w, r, http.StatusNotImplemented, fmt.Errorf("not implmented"))
+	}
+}
+
+func AddUser(as adding.Service) http.HandlerFunc {
 	type okResult struct {
 		ID string `json:"id"`
 	}
@@ -55,13 +88,13 @@ func CreateUser(cr creating.Service) http.HandlerFunc {
 			jsonapi.Error(w, r, http.StatusBadRequest, fmt.Errorf("bad json %w", err))
 			return
 		}
-		user, err := cr.CreateUser(a, creating.NewUser{
+		user, err := as.AddUser(a, adding.NewUser{
 			ID:    input.ID,
 			Name:  input.Name,
 			Email: input.Email,
 		})
 		if err != nil {
-			if errors.Is(err, creating.ErrUnauthorized) {
+			if errors.Is(err, adding.ErrUnauthorized) {
 				jsonapi.Error(w, r, http.StatusUnauthorized, err)
 				return
 			}

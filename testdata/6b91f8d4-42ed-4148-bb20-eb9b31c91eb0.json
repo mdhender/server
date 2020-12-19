@@ -1,0 +1,679 @@
+{
+  "game_id": "6b91f8d4-42ed-4148-bb20-eb9b31c91eb0",
+  "game_name": "tutorial",
+  "created_at": "2020-12-14T21:20:01.525318-07:00",
+  "players": {
+    "mdhender": "bf4c8168-6aab-409d-80cf-a4ee901904ef",
+    "yojimbo": "236bb1a5-1ae8-411a-a71f-791f4f03aa99"
+  },
+  "data": {
+    "game_id": "",
+    "created_at": "2020-12-14T21:20:01.5243184-07:00",
+    "completed_at": "0001-01-01T00:00:00Z",
+    "players": {
+      "mdhender": {
+        "name": "mdhender",
+        "home_system": "23-22-05",
+        "home_world": ""
+      },
+      "yojimbo": {
+        "name": "yojimbo",
+        "home_system": "19-22-08",
+        "home_world": ""
+      }
+    },
+    "systems": [
+      {
+        "system_id": "f17dd67d-6798-450d-b84a-f5cb13b93ff8",
+        "name": "23-22-05",
+        "x": 23,
+        "y": 22,
+        "z": 5,
+        "stars": [
+          {
+            "ID": "dea5786e-faf0-47de-a9c4-4d33c5ddf791",
+            "Name": "23-22-05",
+            "Orbits": [
+              null,
+              {
+                "orbit_id": "46afd01b-1aae-40fb-bd95-dc116c69d885",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 16000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "969d01d0-7352-41fa-931a-f8f8637b921b",
+                      "type": "fuel",
+                      "yield": 73,
+                      "remaining": 51000000
+                    },
+                    {
+                      "deposit_id": "19127244-e359-420f-ab72-50f7b5249cf8",
+                      "type": "fuel",
+                      "yield": 35,
+                      "remaining": 99000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "8717872b-86f7-41a3-ba41-f47f7f8fb030",
+                "planet": {
+                  "planet_id": "",
+                  "type": "gas-giant",
+                  "habitability": 0,
+                  "deposits": [
+                    {
+                      "deposit_id": "3e109c77-30e8-4157-94e1-c46d779f7cbd",
+                      "type": "non-metal",
+                      "yield": 88,
+                      "remaining": 58000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "ad12c08e-98fa-4433-abdf-0efdef644d81",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 25000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "",
+                      "type": "fuel",
+                      "yield": 900,
+                      "remaining": 99999999
+                    },
+                    {
+                      "deposit_id": "",
+                      "type": "metal",
+                      "yield": 900,
+                      "remaining": 99999999
+                    },
+                    {
+                      "deposit_id": "",
+                      "type": "non-metal",
+                      "yield": 900,
+                      "remaining": 99999999
+                    },
+                    {
+                      "deposit_id": "7b137273-fd85-40a4-b2ab-2ca4645f22db",
+                      "type": "non-metal",
+                      "yield": 20,
+                      "remaining": 63000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "09a55503-4ab0-4bc7-b0cd-06b4a4e6d077",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 2000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "4a00b141-6694-4628-8d19-b97cd61df3a1",
+                      "type": "metal",
+                      "yield": 56,
+                      "remaining": 30000000
+                    },
+                    {
+                      "deposit_id": "2e242213-85da-4175-a091-bcf718cf08ef",
+                      "type": "metal",
+                      "yield": 66,
+                      "remaining": 46000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "1231b625-13f0-49f3-a14a-97da0ba5a037"
+              },
+              {
+                "orbit_id": "6e03c374-949c-4fe2-b1ee-05ae6a51ce8d",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 15000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "9a1acb16-52bd-4273-aece-f861fdba87e5",
+                      "type": "non-metal",
+                      "yield": 16,
+                      "remaining": 48000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "f7a7e575-a016-46ea-8743-90146b1bf861",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 24000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "55be6c9e-3fc1-4c96-a43f-ab04de9471e3",
+                      "type": "non-metal",
+                      "yield": 84,
+                      "remaining": 44000000
+                    },
+                    {
+                      "deposit_id": "d65d88d9-99c4-45bb-a21b-bdcb979913bb",
+                      "type": "non-metal",
+                      "yield": 10,
+                      "remaining": 18000000
+                    },
+                    {
+                      "deposit_id": "69430a0f-db00-45ac-9ef2-c92d19f273df",
+                      "type": "fuel",
+                      "yield": 38,
+                      "remaining": 59000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "c2a1eb1b-d6cf-4c31-aa60-e44a6cc68b49",
+                "planet": {
+                  "planet_id": "",
+                  "type": "gas-giant",
+                  "habitability": 4000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "94a85693-512e-423f-ac3f-d4c245213611",
+                      "type": "non-metal",
+                      "yield": 82,
+                      "remaining": 42000000
+                    },
+                    {
+                      "deposit_id": "df2b63fd-7e99-4af4-86d4-38ff708fac01",
+                      "type": "fuel",
+                      "yield": 57,
+                      "remaining": 11000000
+                    },
+                    {
+                      "deposit_id": "927008df-f247-45ca-b95d-c1ea4bc93c50",
+                      "type": "fuel",
+                      "yield": 82,
+                      "remaining": 28000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "933342e4-620e-4342-bacd-c7052d0a2eed",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 12000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "81745a01-8358-41a3-8eea-ec7692b4468b",
+                      "type": "fuel",
+                      "yield": 74,
+                      "remaining": 11000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "e91cd02c-ce67-4e5e-96ef-b5c2e43a9338",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 14000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "f9489f03-5a0a-4261-8fd8-e28c6641d6f0",
+                      "type": "fuel",
+                      "yield": 27,
+                      "remaining": 18000000
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "system_id": "b6429496-08ba-4baa-bdfb-2748d4433e22",
+        "name": "19-22-08",
+        "x": 19,
+        "y": 22,
+        "z": 8,
+        "stars": [
+          {
+            "ID": "cbb40b85-790c-446d-b3f6-c19fbe2173c9",
+            "Name": "19-22-08",
+            "Orbits": [
+              null,
+              {
+                "orbit_id": "12800b99-15b9-4ed4-8025-a49a58a90375",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 3000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "c87848f3-ac6c-4ab9-93f5-c82ae6adc97f",
+                      "type": "fuel",
+                      "yield": 49,
+                      "remaining": 59000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "063ebcb1-36e5-49c8-8b14-b47bc9761607",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 16000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "67405418-1f4e-46c9-8833-96284e5af841",
+                      "type": "fuel",
+                      "yield": 75,
+                      "remaining": 15000000
+                    },
+                    {
+                      "deposit_id": "7ab4d00b-2461-4287-89f4-028a4635c9b2",
+                      "type": "fuel",
+                      "yield": 20,
+                      "remaining": 22000000
+                    },
+                    {
+                      "deposit_id": "5db63ad5-8c09-4e05-be36-ee57ad4d3253",
+                      "type": "metal",
+                      "yield": 49,
+                      "remaining": 42000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "533a96a0-241f-4876-a49d-c7252e589bc6",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 25000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "",
+                      "type": "fuel",
+                      "yield": 900,
+                      "remaining": 99999999
+                    },
+                    {
+                      "deposit_id": "",
+                      "type": "metal",
+                      "yield": 900,
+                      "remaining": 99999999
+                    },
+                    {
+                      "deposit_id": "",
+                      "type": "non-metal",
+                      "yield": 900,
+                      "remaining": 99999999
+                    },
+                    {
+                      "deposit_id": "e40c11e8-79c4-4725-b2d1-9e3ec27bc2d3",
+                      "type": "fuel",
+                      "yield": 28,
+                      "remaining": 15000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "3ed2d84a-6740-4fa5-aef1-26c1bc6fbe1a",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 7000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "a893d832-2bc2-4d99-a905-39f158ff510b",
+                      "type": "metal",
+                      "yield": 27,
+                      "remaining": 67000000
+                    },
+                    {
+                      "deposit_id": "232a7940-8f91-4a10-b5f5-26c1b9f03d0e",
+                      "type": "fuel",
+                      "yield": 19,
+                      "remaining": 25000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "a08c4103-9a20-458a-9777-ac1552ec92b2",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 18000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "3a6720ea-bcc8-465c-a7d7-4f123e2657bd",
+                      "type": "metal",
+                      "yield": 71,
+                      "remaining": 61000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "06463be9-c7c7-45e9-bc5a-975b9d59e364"
+              },
+              {
+                "orbit_id": "20585f84-a8ea-414f-9ca5-8525dbef1b87",
+                "planet": {
+                  "planet_id": "",
+                  "type": "gas-giant",
+                  "habitability": 1000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "3f982c07-856d-4df0-b7a5-34575fc7171d",
+                      "type": "fuel",
+                      "yield": 65,
+                      "remaining": 86000000
+                    },
+                    {
+                      "deposit_id": "b24fbdd6-e7ef-4b4f-b2fa-a7d3cba16553",
+                      "type": "fuel",
+                      "yield": 17,
+                      "remaining": 49000000
+                    },
+                    {
+                      "deposit_id": "f3c1a8b6-147b-4aa3-8435-c5ec1a32c7e6",
+                      "type": "fuel",
+                      "yield": 77,
+                      "remaining": 79000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "c87bab5c-b59c-4e36-a017-48cb9f39137e",
+                "planet": {
+                  "planet_id": "",
+                  "type": "gas-giant",
+                  "habitability": 15000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "368372dc-cce2-440f-98d6-bd73b39cea93",
+                      "type": "metal",
+                      "yield": 12,
+                      "remaining": 15000000
+                    },
+                    {
+                      "deposit_id": "9bb8a706-00a9-49b8-9000-e9b7b6ec61e1",
+                      "type": "fuel",
+                      "yield": 16,
+                      "remaining": 85000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "d9ffa5b8-90c9-4c0e-896a-47d997906a14",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 14000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "bcbfacfd-080f-4c43-9382-fb936a28fc7b",
+                      "type": "non-metal",
+                      "yield": 63,
+                      "remaining": 52000000
+                    },
+                    {
+                      "deposit_id": "82e5353f-94f8-4d14-9d1d-39c1fae8dd39",
+                      "type": "fuel",
+                      "yield": 56,
+                      "remaining": 65000000
+                    },
+                    {
+                      "deposit_id": "7a3d46a6-af85-480a-8410-fbce1b64ccf7",
+                      "type": "non-metal",
+                      "yield": 78,
+                      "remaining": 10000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "5b38ed1c-6617-4a44-8b1f-46b2b4ce2210",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 20000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "c0977aa5-fcde-42e5-8e64-2a015d51a8e9",
+                      "type": "metal",
+                      "yield": 59,
+                      "remaining": 36000000
+                    },
+                    {
+                      "deposit_id": "c2b2e1af-955b-45bf-b07e-372fea22f950",
+                      "type": "metal",
+                      "yield": 34,
+                      "remaining": 2000000
+                    },
+                    {
+                      "deposit_id": "d41067ac-08b0-4705-9f3f-2dfde17eed00",
+                      "type": "fuel",
+                      "yield": 47,
+                      "remaining": 52000000
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "system_id": "7b2cdb9a-1ba7-4ad4-8cd7-aba9946295ed",
+        "name": "11-23-24",
+        "x": 11,
+        "y": 23,
+        "z": 24,
+        "stars": [
+          {
+            "ID": "462eb5f1-51cc-4094-81c4-1a5f30a84edd",
+            "Name": "11-23-24",
+            "Orbits": [
+              null,
+              {
+                "orbit_id": "1f7a1974-f66e-4ae3-b14c-f5b9bf26e3bf",
+                "planet": {
+                  "planet_id": "",
+                  "type": "gas-giant",
+                  "habitability": 10000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "1da1a381-335f-4945-8189-46c286643549",
+                      "type": "metal",
+                      "yield": 13,
+                      "remaining": 32000000
+                    },
+                    {
+                      "deposit_id": "5a177e7f-afd7-48bc-9645-e8a3d9e56701",
+                      "type": "fuel",
+                      "yield": 56,
+                      "remaining": 83000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "3e386ef3-02f2-49f4-bc0b-49b9566c69a2"
+              },
+              {
+                "orbit_id": "897cc558-f5e5-49a4-8d6b-bc222f84434a",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 0,
+                  "deposits": [
+                    {
+                      "deposit_id": "dfdf6095-cfba-4aaa-8b27-91d42ee14bdf",
+                      "type": "fuel",
+                      "yield": 34,
+                      "remaining": 23000000
+                    },
+                    {
+                      "deposit_id": "da2c4537-cdbc-48a5-880c-fd8b4dbaf0eb",
+                      "type": "metal",
+                      "yield": 63,
+                      "remaining": 92000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "787a8b97-66fb-4d23-9457-0de574580bd6",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 14000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "a280204c-bc50-4cd5-9e52-ca68b97446e0",
+                      "type": "non-metal",
+                      "yield": 76,
+                      "remaining": 43000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "32318a5f-cb13-4219-b8a4-164e8eb257a2",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 11000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "c2d48edf-df31-447e-a997-c654b8e888d0",
+                      "type": "non-metal",
+                      "yield": 44,
+                      "remaining": 28000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "218ba68a-71ca-4969-849f-70249b51cb35"
+              },
+              {
+                "orbit_id": "8e324cac-4646-4ca7-80bc-d6cbf5e8e51d",
+                "planet": {
+                  "planet_id": "",
+                  "type": "gas-giant",
+                  "habitability": 14000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "eccea610-79fe-4734-989e-6f3e1cf12d15",
+                      "type": "fuel",
+                      "yield": 35,
+                      "remaining": 29000000
+                    },
+                    {
+                      "deposit_id": "764b50a9-65cf-493e-bfd4-8c0473e1299f",
+                      "type": "fuel",
+                      "yield": 27,
+                      "remaining": 64000000
+                    },
+                    {
+                      "deposit_id": "5eea28d3-af02-454b-b6e1-1dff937d904d",
+                      "type": "metal",
+                      "yield": 38,
+                      "remaining": 41000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "cc11c9a4-5a47-4660-8896-ff56194c7436",
+                "planet": {
+                  "planet_id": "",
+                  "type": "asteroid-belt",
+                  "habitability": 6000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "d9302b0f-58ab-499b-8760-56b6af7d4c51",
+                      "type": "non-metal",
+                      "yield": 53,
+                      "remaining": 65000000
+                    },
+                    {
+                      "deposit_id": "c1f4c9d8-8743-4b5e-a2f2-6c5d5717fd0f",
+                      "type": "non-metal",
+                      "yield": 61,
+                      "remaining": 55000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "1560c451-3390-4d2b-835f-e34ca8a008eb",
+                "planet": {
+                  "planet_id": "",
+                  "type": "terrestrial",
+                  "habitability": 24000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "f61b615e-a116-44f5-a4a3-2ac796c4ac23",
+                      "type": "non-metal",
+                      "yield": 54,
+                      "remaining": 58000000
+                    },
+                    {
+                      "deposit_id": "f67641c0-9b7a-46fb-b86e-b7a0a457bac4",
+                      "type": "non-metal",
+                      "yield": 38,
+                      "remaining": 15000000
+                    }
+                  ]
+                }
+              },
+              {
+                "orbit_id": "2acb0ec5-ba87-4377-9fae-826422fc599e",
+                "planet": {
+                  "planet_id": "",
+                  "type": "gas-giant",
+                  "habitability": 10000000,
+                  "deposits": [
+                    {
+                      "deposit_id": "e876a5dd-4304-4624-98c3-d08cb02f9d4a",
+                      "type": "non-metal",
+                      "yield": 85,
+                      "remaining": 25000000
+                    },
+                    {
+                      "deposit_id": "8db7443e-780e-486b-900a-5a5973125d76",
+                      "type": "fuel",
+                      "yield": 66,
+                      "remaining": 70000000
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Ships": {}
+  }
+}
