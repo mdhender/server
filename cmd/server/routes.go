@@ -44,8 +44,8 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("POST", "/api/engine/restart", s.restart())
 	router.Handle("POST", "/api/game/orders", rest.UpdateGameOrders(rc.services.updating))
 	router.Handle("POST", "/api/game/save", rest.UpdateGame(rc.services.updating))
-	router.Handle("POST", "/api/games", rest.AddGame(rc.services.adding))
-	router.Handle("POST", "/api/users", rest.AddUser(rc.services.adding))
+	router.Handle("POST", "/api/games/create", rest.AddGame(rc.services.adding))
+	router.Handle("POST", "/api/users/create", rest.AddUser(rc.services.adding))
 
 	// assume that all other routes are to serve the front end application
 	router.NotFound = rc.notFound
