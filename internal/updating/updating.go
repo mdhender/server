@@ -23,13 +23,19 @@ import (
 
 type Repository interface {
 	UpdateGame(a *auth.Authorization, g GameUpdates) error
+	UpdateGameOrders(a *auth.Authorization, o Orders) error
 }
 
 type Service interface {
 	UpdateGame(a *auth.Authorization, g GameUpdates) error
+	UpdateGameOrders(a *auth.Authorization, o Orders) error
 }
 
 type GameUpdates struct {
+	ID string
+}
+
+type Orders struct {
 	ID string
 }
 
@@ -43,6 +49,10 @@ type service struct {
 
 func (s *service) UpdateGame(a *auth.Authorization, g GameUpdates) error {
 	return s.r.UpdateGame(a, g)
+}
+
+func (s *service) UpdateGameOrders(a *auth.Authorization, o Orders) error {
+	return s.r.UpdateGameOrders(a, o)
 }
 
 // ErrNotAuthorized is used when the entity making

@@ -37,14 +37,19 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("GET", "/api/games/:id/players/:player_name/print-out/turn/:turn_number", rest.GetGamePlayerPrintout(rc.services.reporting))
 	router.Handle("GET", "/api/games/:id/systems", rest.GetGameSystems(rc.services.listing))
 	router.Handle("GET", "/api/games/:id/systems/:system_name", rest.GetGameSystem(rc.services.listing))
+
 	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.listing))
 	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.listing))
+
 	router.Handle("GET", "/api/version", rest.GetVersion(rc.services.listing))
 
 	router.Handle("POST", "/api/engine/restart", s.restart())
+
+	router.Handle("POST", "/api/game/orders", rest.UpdateGameOrders(rc.services.updating))
 	router.Handle("POST", "/api/game/save", rest.UpdateGame(rc.services.updating))
+
 	router.Handle("POST", "/api/games", rest.AddGame(rc.services.adding))
-	router.Handle("POST", "/api/games/:id/orders", s.postGameOrders())
+
 	router.Handle("POST", "/api/users", rest.AddUser(rc.services.adding))
 
 	// assume that all other routes are to serve the front end application
