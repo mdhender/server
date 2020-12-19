@@ -29,17 +29,19 @@ import (
 func routes(s *server, rc routeConfig) http.Handler {
 	router := way.NewRouter()
 
+	router.Handle("GET", "/api/game/:id", rest.GetGame(rc.services.listing))
+	router.Handle("GET", "/api/game/:id/players", rest.GetGamePlayers(rc.services.listing))
+	router.Handle("GET", "/api/game/:id/players/:player_name", rest.GetGamePlayer(rc.services.listing))
+	router.Handle("GET", "/api/game/:id/players/:player_name/print-out", rest.GetGamePlayerPrintout(rc.services.reporting))
+	router.Handle("GET", "/api/game/:id/players/:player_name/print-out/turn/:turn_number", rest.GetGamePlayerPrintout(rc.services.reporting))
+	router.Handle("GET", "/api/game/:id/systems", rest.GetGameSystems(rc.services.listing))
+	router.Handle("GET", "/api/game/:id/systems/:system_name", rest.GetGameSystem(rc.services.listing))
+
 	router.Handle("GET", "/api/games", rest.GetGames(rc.services.listing))
-	router.Handle("GET", "/api/games/:id", rest.GetGame(rc.services.listing))
-	router.Handle("GET", "/api/games/:id/players", rest.GetGamePlayers(rc.services.listing))
-	router.Handle("GET", "/api/games/:id/players/:player_name", rest.GetGamePlayer(rc.services.listing))
-	router.Handle("GET", "/api/games/:id/players/:player_name/print-out", rest.GetGamePlayerPrintout(rc.services.reporting))
-	router.Handle("GET", "/api/games/:id/players/:player_name/print-out/turn/:turn_number", rest.GetGamePlayerPrintout(rc.services.reporting))
-	router.Handle("GET", "/api/games/:id/systems", rest.GetGameSystems(rc.services.listing))
-	router.Handle("GET", "/api/games/:id/systems/:system_name", rest.GetGameSystem(rc.services.listing))
+
+	router.Handle("GET", "/api/user/:id", rest.GetUser(rc.services.listing))
 
 	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.listing))
-	router.Handle("GET", "/api/users/:id", rest.GetUser(rc.services.listing))
 
 	router.Handle("GET", "/api/version", rest.GetVersion(rc.services.listing))
 
