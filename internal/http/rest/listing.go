@@ -33,7 +33,7 @@ func GetGame(ls listing.Service) http.HandlerFunc {
 		Name string `json:"name"`
 	}
 
-	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
 	a.Roles["admin"] = true
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,7 @@ func GetGamePlayer(ls listing.Service) http.HandlerFunc {
 		Name string `json:"name"`
 	}
 
-	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
 	a.Roles["admin"] = true
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -78,12 +78,9 @@ func GetGamePlayer(ls listing.Service) http.HandlerFunc {
 
 // GetGamePlayers returns all the players specific game
 func GetGamePlayers(ls listing.Service) http.HandlerFunc {
-	type detail struct {
-		Name string `json:"name"`
-	}
-	type okResult []detail
+	type okResult []string
 
-	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
 	a.Roles["admin"] = true
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -97,11 +94,9 @@ func GetGamePlayers(ls listing.Service) http.HandlerFunc {
 			jsonapi.Error(w, r, http.StatusInternalServerError, err)
 			return
 		}
-		var list okResult = []detail{} // create an empty list since we never return nil
-		for _, player := range players {
-			list = append(list, detail{
-				Name: player.Name,
-			})
+		var list okResult = []string{} // create an empty list since we never return nil
+		for _, p := range players {
+			list = append(list, p)
 		}
 		jsonapi.Ok(w, r, http.StatusOK, list)
 	}
@@ -119,7 +114,7 @@ func GetGames(ls listing.Service) http.HandlerFunc {
 		Data []string `json:"data"`
 	}
 
-	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
 	a.Roles["admin"] = true
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -143,7 +138,7 @@ func GetUser(ls listing.Service) http.HandlerFunc {
 		Email string `json:"email"`
 	}
 
-	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
 	a.Roles["admin"] = true
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -174,7 +169,7 @@ func GetUsers(ls listing.Service) http.HandlerFunc {
 		Data []string `json:"data"`
 	}
 
-	a := &auth.Authorization{ID: "mdhender", Roles: make(map[string]bool)}
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
 	a.Roles["admin"] = true
 
 	return func(w http.ResponseWriter, r *http.Request) {

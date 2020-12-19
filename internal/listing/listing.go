@@ -26,7 +26,7 @@ import (
 type Repository interface {
 	GetGame(a *auth.Authorization, id string) (Game, error)
 	GetGamePlayer(a *auth.Authorization, id string, name string) (Player, error)
-	GetGamePlayers(a *auth.Authorization, id string) ([]Player, error)
+	GetGamePlayers(a *auth.Authorization, id string) (PlayerList, error)
 	GetGames(a *auth.Authorization, ids ...string) []Game
 
 	GetUser(a *auth.Authorization, id string) (User, error)
@@ -42,7 +42,7 @@ type VersionRepository interface {
 type Service interface {
 	GetGame(a *auth.Authorization, id string) (Game, error)
 	GetGamePlayer(a *auth.Authorization, id string, name string) (Player, error)
-	GetGamePlayers(a *auth.Authorization, id string) ([]Player, error)
+	GetGamePlayers(a *auth.Authorization, id string) (PlayerList, error)
 	GetGames(a *auth.Authorization, ids ...string) []Game
 
 	GetUser(a *auth.Authorization, id string) (User, error)
@@ -53,22 +53,25 @@ type Service interface {
 
 // Game defines the properties of a game.
 type Game struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   string
+	Name string
 }
 
 // Player defines the properties of a player.
 type Player struct {
-	Name     string `json:"id"`
-	UserName string `json:"user_name"`
+	Name     string
+	UserName string
 }
+
+// PlayerList defines a listing of player summaries.
+type PlayerList []string
 
 // User defines the properties of a user.
 type User struct {
-	ID      string    `json:"id"`
-	Email   string    `json:"email"`
-	Name    string    `json:"name"`
-	Created time.Time `json:"created"`
+	ID      string
+	Email   string
+	Name    string
+	Created time.Time
 }
 
 // Version defines the properties of a version.
@@ -103,7 +106,7 @@ func (s *service) GetGamePlayer(a *auth.Authorization, id string, name string) (
 
 // GetGamePlayers returns all the players in a specific game that the entity is authorized to list.
 // Returns not found if the entity isn't authorized to list the game or it does not exist.
-func (s *service) GetGamePlayers(a *auth.Authorization, id string) ([]Player, error) {
+func (s *service) GetGamePlayers(a *auth.Authorization, id string) (PlayerList, error) {
 	return s.r.GetGamePlayers(a, id)
 }
 

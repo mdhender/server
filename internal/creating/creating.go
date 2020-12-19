@@ -33,16 +33,16 @@ type Service interface {
 
 // NewUser defines the properties of a user to create.
 type NewUser struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	ID    string
+	Email string
+	Name  string
 }
 
 // User defines the properties of a user.
 type User struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	ID    string
+	Email string
+	Name  string
 }
 
 type service struct {

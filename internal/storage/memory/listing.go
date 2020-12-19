@@ -60,16 +60,13 @@ func (m *Store) GetGamePlayer(a *auth.Authorization, id, name string) (listing.P
 
 // GetGamePlayers returns data for all players in a game.
 // If the caller is not authorized or the game/player does not exist, it returns the not found error.
-func (m *Store) GetGamePlayers(a *auth.Authorization, id string) ([]listing.Player, error) {
-	var list []listing.Player = []listing.Player{}
+func (m *Store) GetGamePlayers(a *auth.Authorization, id string) (listing.PlayerList, error) {
+	var list listing.PlayerList
 	isAdmin := a.HasRole("admin")
 	if isAdmin {
 		if game, ok := m.games.id[id]; ok {
 			for _, player := range game.players {
-				list = append(list, listing.Player{
-					Name:     player.name,
-					UserName: player.user,
-				})
+				list = append(list, player.name)
 			}
 			return list, nil
 		}
