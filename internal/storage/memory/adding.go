@@ -24,6 +24,8 @@ import (
 	"strings"
 )
 
+// This file implements the adding.Repository interface
+
 // AddGame adds a new game to the store.
 // If the caller is an admin, then the request may specify the ID to use.
 func (m *Store) AddGame(a *auth.Authorization, ng adding.NewGame) (adding.Game, error) {
