@@ -21,6 +21,8 @@ A simple game server
     1. Process orders
         1. Combine all players orders
 1. Sigh and contemplate adding a database on the backend
+1. Despite the best of intentions, the API is turning into CRUD.
+It should focus on actions and features.
 
 # Discussions
 The "discussion" tab is activated on Github.
