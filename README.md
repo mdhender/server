@@ -1,6 +1,34 @@
 # server
 A simple game server
 
+# Starting the server
+You must install the Go compiler first.
+
+Download the source code and build the server.
+
+    $ go build cmd/server
+
+Create a configuration file named `config.json` in the same directory as the server you just built.
+
+The configuration file must contain the following:
+
+    {
+        "game-file-save-path": "D:\\GoLand\\server\\testdata\\",
+        "public-root": "D:\\GoLand\\server\\public",
+        "salt": ".pepper."
+    }
+
+Change the paths to point to your directories.
+
+You can add other options, but these are the minimum needed to start.
+
+Start the server
+
+    $ ./server --config ./config.json
+
+That should start the server running on your computer.
+Start your browser and enter the url `http://localhost:8080` to start.
+
 # TODO
 1. Pull todo-list from the code comments
 1. Actions to create
