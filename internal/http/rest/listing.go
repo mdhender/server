@@ -19,6 +19,7 @@ package rest
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/mdhender/server/internal/auth"
 	"github.com/mdhender/server/internal/jsonapi"
 	"github.com/mdhender/server/internal/listing"
@@ -250,23 +251,24 @@ func GetUsers(ls listing.Service) http.HandlerFunc {
 
 func GetVersion(ls listing.Service) http.HandlerFunc {
 	type okResult struct {
-		Major      int    `json:"major"`
-		Minor      int    `json:"minor"`
-		Patch      int    `json:"patch"`
-		PreRelease string `json:"pre_release,omitempty"`
-		Build      string `json:"build,omitempty"`
-		SemVerURL  string `json:"semver_url"`
+		Version   string `json:"semver"`
+		SemVerURL string `json:"semver_url"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		v := ls.GetVersion()
 
+		var versionString string
+		if v.PreRelease == "" {
+			versionString = fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Patch)
+		} else if v.Build == "" {
+			versionString = fmt.Sprintf("%d.%d.%d-%s", v.Major, v.Minor, v.Patch, v.PreRelease)
+		} else {
+			versionString = fmt.Sprintf("%d.%d.%d-%s+%s", v.Major, v.Minor, v.Patch, v.PreRelease, v.Build)
+		}
+
 		jsonapi.Ok(w, r, http.StatusOK, okResult{
-			Major:      v.Major,
-			Minor:      v.Minor,
-			Patch:      v.Patch,
-			PreRelease: v.PreRelease,
-			Build:      v.Build,
-			SemVerURL:  "https://semver.org/",
+			Version:   versionString,
+			SemVerURL: "https://semver.org/",
 		})
 	}
 }

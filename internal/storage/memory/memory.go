@@ -27,7 +27,7 @@ func New() (*Store, error) {
 	m.users.id = make(map[string]*user)
 	m.users.email = make(map[string]string)
 	m.users.name = make(map[string]string)
-	m.version = version{}
+	m.version = version{0,0,1,"",""}
 
 	return m, nil
 }

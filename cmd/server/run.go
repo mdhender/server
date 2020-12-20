@@ -47,8 +47,27 @@ func run(cfg *config) error {
 	if err != nil {
 		return err
 	}
-	srv.Handler = routes(srv, rc)
+	srv.Handler = CorsHandler(routes(srv, rc))
 
 	log.Printf("[server] listening on %s\n", srv.Addr)
 	return srv.ListenAndServe()
+}
+
+// Handler returns the adapter's handler.
+func CorsHandler(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("[cors] %s %q\n", r.Method, r.URL.Path)
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "DELETE, GET, HEAD, OPTIONS, POST, PUT")
+			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+			w.WriteHeader(http.StatusNoContent)
+			return
+		} else if r.Method == "GET" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "DELETE, GET, HEAD, OPTIONS, POST, PUT")
+			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		}
+		next.ServeHTTP(w, r)
+	}
 }
