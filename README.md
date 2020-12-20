@@ -33,17 +33,12 @@ The server tries to use [Ports and Adapters](https://en.wikipedia.org/wiki/Hexag
 That means that we define interfaces to adapt HTTP requests to Services to the Repository.
 
 To untangle this, you should start with the file `cmd/server/routes.go`.
-That shows all of the routes that the server implements.
-
-    NOTE: I'm currently in the middle of moving some concept code to
-    the ports architecture. The routes that use `rest.XXX` are ports
-    style. The routes that are `s.XXX` are from the concept code and
-    are going away.
+That shows the routes implemented by the server.
 
 Once you've seen the routes, look at `pkg/http/rest`.
-That package implements all of the handlers that accept HTTP requests from the front-end client.
+That package implements the handlers that accept HTTP requests from the front-end client.
 
-The handlers in the `rest` package take `creating` or `listing` interfaces.
+The handlers in the `rest` package take `adding`, `creating`, `listing`, and `reporting` interfaces.
 Those interfaces define the functions that must be implemented by the service and repository packages.
 
 The `rest` handlers are responsible for extracting the form data from the request.
