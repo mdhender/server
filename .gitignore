@@ -6,5 +6,6 @@
 *.so
 *.test
 .idea/
+node_modules/
 server
 # testdata/
