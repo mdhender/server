@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Router} from "@reach/router";
 
+import About from "./components/About";
 import Banner from "./components/Banner";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
@@ -21,6 +22,7 @@ function App() {
 			<div id="content">
 				<Router>
 					<Home path="/"/>
+					<About path="about"/>
 				</Router>
 			</div>
 			<Sidebar/>
