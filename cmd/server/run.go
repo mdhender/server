@@ -17,7 +17,6 @@
 package main
 
 import (
-	"github.com/mdhender/server/internal/handlers/spa"
 	"github.com/mdhender/server/internal/storage/memory"
 	"log"
 	"net/http"
@@ -26,7 +25,6 @@ import (
 func run(cfg *config) error {
 	rc := routeConfig{
 		gameFileSavePath: cfg.Games.FileSavePath,
-		notFound:         http.StripPrefix("/", spa.Handler(cfg.Server.PublicRoot)),
 	}
 
 	ds, err := memory.New()

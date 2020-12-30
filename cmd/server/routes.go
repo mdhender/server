@@ -47,15 +47,11 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("POST", "/api/games/create", rest.AddGame(rc.services.adding))
 	router.Handle("POST", "/api/users/create", rest.AddUser(rc.services.adding))
 
-	// assume that all other routes are to serve the front end application
-	router.NotFound = rc.notFound
-
 	return router
 }
 
 type routeConfig struct {
 	gameFileSavePath string
-	notFound         http.Handler
 	services         struct {
 		adding    adding.Service
 		listing   listing.Service
