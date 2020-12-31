@@ -425,12 +425,6 @@ type Pay struct {
 	PopulationType string  `json:"population_type"` // type of population to pay
 }
 
-// PermissionToColonize order...
-type PermissionToColonize struct {
-	ColonyID string `json:"colony_id"` // id of colony being ordered
-	ShipID   string `json:"ship_id"`   // id of ship being granted permission
-}
-
 // PickUpItem order...
 type PickUpItem struct {
 	SourceID  string `json:"source_id"` // id of ship or colony being ordered

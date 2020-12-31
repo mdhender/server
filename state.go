@@ -53,6 +53,15 @@ func (st *State) LookupColony(id string) *Colony {
 	return nil
 }
 
+func (st *State) LookupPlanet(id string) *Planet {
+	if o, ok := st.Lookup(id); ok {
+		if planet, ok := o.(*Planet); ok {
+			return planet
+		}
+	}
+	return nil
+}
+
 func (st *State) LookupPolity(id string) *Polity {
 	if o, ok := st.Lookup(id); ok {
 		if p, ok := o.(*Polity); ok {
@@ -101,6 +110,7 @@ type Planet struct {
 	Type         PlanetType
 	Habitability int // range from 0 to 25
 	Deposits     []*Resource
+	colonies     []*Colony
 }
 
 type Polity struct {
@@ -280,6 +290,18 @@ func (st *State) assignSystemName(system *System, name string) error {
 		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
 	}
 	return fmt.Errorf("State.assignSystemName: %w", ERRNOTIMPLEMENTED)
+}
+
+// permissionToColonize enables a ship to establish a new colony on a planet.
+// Permission expires at the end of the current turn.
+func (st *State) permissionToColonize(planet *Planet, ship *Ship) error {
+	if planet == nil {
+		return fmt.Errorf("missing planet: %w", ERRBADREQUEST)
+	} else if ship == nil {
+		return fmt.Errorf("missing ship: %w", ERRBADREQUEST)
+	}
+
+	return fmt.Errorf("State.permissionToColonize: %w", ERRNOTIMPLEMENTED)
 }
 
 // transferColony transfers control of a colony to another Polity.

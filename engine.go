@@ -74,6 +74,13 @@ func (st *State) PostOrders(orders Orders) error {
 			if err := st.Name(orderedBy, order.Name.EntityID, order.Name.Type, order.Name.Name); err != nil {
 				errs = append(errs, err)
 			}
+		case order.PermissionToColonize != nil:
+			if debug {
+				log.Printf("[orders] %4d permissionToColonize %v\n", i, *order.PermissionToColonize)
+			}
+			if err := st.PermissionToColonize(orderedBy, order.PermissionToColonize.PlanetID, order.PermissionToColonize.ShipID); err != nil {
+				errs = append(errs, err)
+			}
 		case order.Run != nil:
 			if debug {
 				log.Printf("[orders] %4d run %v\n", i, *order.Run)
