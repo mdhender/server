@@ -342,12 +342,6 @@ type Jump struct {
 	Offset int    `json:"offset"`  // distance (in tactical distance units) to arrive from destination
 }
 
-// Junk order...
-type Junk struct {
-	SourceID string `json:"source_id"` // id of ship or colony being ordered
-	TargetID string `json:"target_id"` // id of ship or colony being targeted
-}
-
 // LaunchRobotProbe order...
 // Type must be one of "SURVEY", "ORBIT", "SYSTEM", "SHIP", or "COLONY"
 type LaunchRobotProbe struct {
