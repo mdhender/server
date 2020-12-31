@@ -16,7 +16,12 @@
 
 package engine
 
-import "log"
+import (
+	"fmt"
+	"log"
+	"unicode"
+	"unicode/utf8"
+)
 
 type State struct {
 	maps struct {
@@ -68,7 +73,7 @@ func (st *State) LookupShip(id string) *Ship {
 
 type System struct {
 	ID     string
-	Name   string
+	name   string
 	Coords struct {
 		X int
 		Y int
@@ -136,6 +141,7 @@ type Colony struct {
 	controlledBy   *Polity
 	system         *System
 	homePortTo     []*Ship
+	name           string
 }
 
 type EngineUnit struct{}
@@ -151,6 +157,7 @@ type Ship struct {
 	controlledBy *Polity
 	system       *System
 	homePort     *Colony
+	name         string
 }
 
 type StructuralUnit struct{}
@@ -191,14 +198,11 @@ func (s *Ship) acceptsOrdersFrom(p *Polity) bool {
 // assignHomePort updates the home port of the given ship
 func (st *State) assignHomePort(ship *Ship, colony *Colony) error {
 	if ship == nil {
-		log.Printf("[bug] updateHomePort: ship is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing ship: %w", ERRBADREQUEST)
 	} else if colony == nil {
-		log.Printf("[bug] updateHomePort: colony is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing colony: %w", ERRBADREQUEST)
 	} else if ship.controlledBy != colony.controlledBy {
-		log.Printf("[bug] updateHomePort: assert(ship aligned to colony)\n")
-		return ERRBUG
+		return fmt.Errorf("ship not aligned to colony: %w", ERRBADREQUEST)
 	} else if ship.homePort == colony {
 		// already assigned, so nothing to do
 		return nil
@@ -213,7 +217,7 @@ func (st *State) assignHomePort(ship *Ship, colony *Colony) error {
 			}
 		}
 		if len(ships) == len(ship.homePort.homePortTo) {
-			log.Printf("[bug] updateHomePort: assert(ship's prior homePort valid)\n")
+			log.Printf("[bug] assignHomePort: assert(ship's prior homePort valid)\n")
 		}
 		ship.homePort.homePortTo = ships
 	}
@@ -224,15 +228,67 @@ func (st *State) assignHomePort(ship *Ship, colony *Colony) error {
 	return nil
 }
 
+func (st *State) assignColonyName(colony *Colony, name string) error {
+	if colony == nil {
+		return fmt.Errorf("missing colony: %w", ERRBADREQUEST)
+	} else if name == "" || len(name) > 50 {
+		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
+	}
+	return fmt.Errorf("State.assignColonyName: %w", ERRNOTIMPLEMENTED)
+}
+
+func (st *State) assignPlanetName(planet *Planet, name string) error {
+	if planet == nil {
+		return fmt.Errorf("missing planet: %w", ERRBADREQUEST)
+	} else if name == "" || len(name) > 50 {
+		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
+	}
+	return fmt.Errorf("State.assignPlanetName: %w", ERRNOTIMPLEMENTED)
+}
+
+func (st *State) assignPolityName(polity *Polity, name string) error {
+	if polity == nil {
+		return fmt.Errorf("missing polity: %w", ERRBADREQUEST)
+	} else if name == "" || len(name) > 50 {
+		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
+	}
+	return fmt.Errorf("State.assignPolityName: %w", ERRNOTIMPLEMENTED)
+}
+
+func (st *State) assignShipName(ship *Ship, name string) error {
+	if ship == nil {
+		return fmt.Errorf("missing ship: %w", ERRBADREQUEST)
+	} else if name == "" || len(name) > 50 {
+		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
+	}
+	return fmt.Errorf("State.assignShipName: %w", ERRNOTIMPLEMENTED)
+}
+
+func (st *State) assignStarName(star *Star, name string) error {
+	if star == nil {
+		return fmt.Errorf("missing star: %w", ERRBADREQUEST)
+	} else if name == "" || len(name) > 50 {
+		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
+	}
+	return fmt.Errorf("State.assignStarName: %w", ERRNOTIMPLEMENTED)
+}
+
+func (st *State) assignSystemName(system *System, name string) error {
+	if system == nil {
+		return fmt.Errorf("missing system: %w", ERRBADREQUEST)
+	} else if name == "" || len(name) > 50 {
+		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
+	}
+	return fmt.Errorf("State.assignSystemName: %w", ERRNOTIMPLEMENTED)
+}
+
 // transferColony transfers control of a colony to another Polity.
 // Can be used to give away or seize control of a colony.
 func (st *State) transferColony(colony *Colony, from, to *Polity) error {
 	if colony == nil {
-		log.Printf("[bug] transferColony: colony is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing colony: %w", ERRBADREQUEST)
 	} else if to == nil {
-		log.Printf("[bug] transferColony: to is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing to: %w", ERRBADREQUEST)
 	}
 	// remove from current controller
 	log.Printf("[todo] transferColony: remove from current controller\n")
@@ -249,14 +305,12 @@ func (st *State) transferColony(colony *Colony, from, to *Polity) error {
 // the new controller the ally of the Polity.
 func (st *State) transferPolity(from, to *Polity) error {
 	if from == nil {
-		log.Printf("[bug] transferPolity: from is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing from: %w", ERRBADREQUEST)
 	} else if to == nil {
-		log.Printf("[bug] transferPolity: to is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing to: %w", ERRBADREQUEST)
 	} else if from == to {
-		log.Printf("[bug] transferPolity: from == to\n")
-		return ERRBUG
+		// nothing to do
+		return nil
 	}
 
 	from.diplomacy = make(map[string]DiplomaticStatus)
@@ -276,11 +330,12 @@ func (st *State) transferPolity(from, to *Polity) error {
 // Can be used to give away or seize control of a ship.
 func (st *State) transferShip(ship *Ship, from, to *Polity) error {
 	if ship == nil {
-		log.Printf("[bug] transferShip: ship is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing ship: %w", ERRBADREQUEST)
 	} else if to == nil {
-		log.Printf("[bug] transferShip: to is nil\n")
-		return ERRBUG
+		return fmt.Errorf("missing to: %w", ERRBADREQUEST)
+	} else if ship.controlledBy == to {
+		// nothing to do
+		return nil
 	}
 	// remove from current controller
 	log.Printf("[todo] transferShip: remove from current controller\n")
@@ -335,4 +390,36 @@ func (p *Polity) isViceroyOf(ruler *Polity) bool {
 		}
 	}
 	return false
+}
+
+// sanitize is an attempt to replace problematic characters with an underscore.
+// it also forces the string to be valid utf-8.'
+// for some reason, it also avoids runs of replacement characters.
+func sanitize(s string) string {
+	var dst, prior string
+	for src := []byte(s); len(src) != 0; {
+		r, w := utf8.DecodeRune(src)
+		switch r {
+		case utf8.RuneError:
+			if prior != " " {
+				dst, prior = dst+" ", " "
+			}
+		case '\\', '<', '>', '%':
+			if prior != "_" {
+				dst, prior = dst+"_", "_"
+			}
+		default:
+			if unicode.IsPrint(r) {
+				dst += string(r)
+			} else if unicode.IsSpace(r) {
+				if prior != " " {
+					dst, prior = dst+" ", " "
+				}
+			} else if prior != "_" {
+				dst, prior = dst+"_", "_"
+			}
+		}
+		src = src[w:]
+	}
+	return dst
 }

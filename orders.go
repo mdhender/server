@@ -399,15 +399,6 @@ type Move struct {
 	Offset int    `json:"offset"`  // distance (in tactical distance units) to arrive from destination
 }
 
-// Name order...
-// Note: original order used "Entity" instead of "Type".
-// Entity must be one of SHIP, COLONY, SYSTEM, STAR, PLANET, or PLAYER
-type Name struct {
-	EntityID string `json:"entity_id"` // id of entity being ordered
-	Type     string `json:"type"`      // type of entity to assign name to
-	Name     string `json:"name"`      // name to assign to the entity
-}
-
 // Note order...
 // Text must be UTF-8 and is truncated at 200 runes.
 type Note struct {
