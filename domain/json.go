@@ -65,4 +65,3 @@ func (nr Resource) MarshalJSON() ([]byte, error) {
 		AmountRemaining: amtRemaining,
 	})
 }
-
