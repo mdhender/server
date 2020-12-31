@@ -318,12 +318,6 @@ type FactoryGroupChange struct {
 	Quantity int    `json:"quantity"`  // number of factory units to move
 }
 
-// HomePortChange order...
-type HomePortChange struct {
-	ShipID   string `json:"ship_id"`   // id of ship being ordered
-	ColonyID string `json:"colony_id"` // id of colony being targeted
-}
-
 // Invade order...
 type Invade struct {
 	SourceID string `json:"source_id"` // id of ship or colony being ordered

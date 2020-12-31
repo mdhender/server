@@ -135,6 +135,7 @@ type Colony struct {
 	originalPolity *Polity // set only if this is a Home Colony?
 	controlledBy   *Polity
 	system         *System
+	homePortTo     []*Ship
 }
 
 type EngineUnit struct{}
@@ -149,6 +150,7 @@ type RobotUnit struct{}
 type Ship struct {
 	controlledBy *Polity
 	system       *System
+	homePort     *Colony
 }
 
 type StructuralUnit struct{}
@@ -184,6 +186,42 @@ func (s *Ship) acceptsOrdersFrom(p *Polity) bool {
 		}
 	}
 	return s.controlledBy == p
+}
+
+// assignHomePort updates the home port of the given ship
+func (st *State) assignHomePort(ship *Ship, colony *Colony) error {
+	if ship == nil {
+		log.Printf("[bug] updateHomePort: ship is nil\n")
+		return ERRBUG
+	} else if colony == nil {
+		log.Printf("[bug] updateHomePort: colony is nil\n")
+		return ERRBUG
+	} else if ship.controlledBy != colony.controlledBy {
+		log.Printf("[bug] updateHomePort: assert(ship aligned to colony)\n")
+		return ERRBUG
+	} else if ship.homePort == colony {
+		// already assigned, so nothing to do
+		return nil
+	}
+
+	// remove the ship from its current home port
+	if ship.homePort != nil {
+		var ships []*Ship
+		for _, s := range ship.homePort.homePortTo {
+			if s != ship {
+				ships = append(ships, s)
+			}
+		}
+		if len(ships) == len(ship.homePort.homePortTo) {
+			log.Printf("[bug] updateHomePort: assert(ship's prior homePort valid)\n")
+		}
+		ship.homePort.homePortTo = ships
+	}
+
+	ship.homePort = colony
+	colony.homePortTo = append(colony.homePortTo, ship)
+
+	return nil
 }
 
 // transferColony transfers control of a colony to another Polity.

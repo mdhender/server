@@ -53,6 +53,13 @@ func (st *State) PostOrders(orders Orders) error {
 			if err := st.Give(orderedBy, order.Give.AssetID, order.Give.TargetID); err != nil {
 				errs = append(errs, err)
 			}
+		case order.HomePortChange != nil:
+			if debug {
+				log.Printf("[orders] %4d homePortChange %v\n", i, *order.HomePortChange)
+			}
+			if err := st.HomePortChange(orderedBy, order.HomePortChange.ShipID, order.HomePortChange.ColonyID); err != nil {
+				errs = append(errs, err)
+			}
 		case order.Junk != nil:
 			if debug {
 				log.Printf("[orders] %4d junk %v\n", i, *order.Junk)
