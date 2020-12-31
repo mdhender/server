@@ -27,12 +27,13 @@ type Junk struct {
 	AssetID string `json:"asset_id"` // id of ship or colony being junked
 }
 
-// Junk disassembles an asset, recycling components.
+// Junk disassembles an asset, reclaiming components where possible, recycling where not.
 //
 // 1. Actor identified by the ActorID must be controlled by the polity issuing the order.
 // 2. Asset identified by the AssetID must be controlled by the polity issuing the order.
 // 3. Actor and Asset must be in the same Star System.
 // 4. Actor and Asset must be within Transport Range of each other.
+// 5. The Asset being junked will cease to exist.
 func (st *State) Junk(orderedByID, actorID, assetID string) error {
 	orderedBy := st.LookupPolity(orderedByID)
 	if orderedBy == nil {
@@ -47,10 +48,10 @@ func (st *State) Junk(orderedByID, actorID, assetID string) error {
 		ship         *Ship
 		system       *System
 	}
-	if colony := st.LookupColony(assetID); colony != nil {
+	if colony := st.LookupColony(actorID); colony != nil {
 		actor.controlledBy = colony.controlledBy
 		actor.colony = colony
-	} else if ship := st.LookupShip(assetID); ship != nil {
+	} else if ship := st.LookupShip(actorID); ship != nil {
 		actor.controlledBy = ship.controlledBy
 		actor.ship = ship
 	} else {
