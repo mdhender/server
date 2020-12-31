@@ -199,7 +199,7 @@ type BuildChange struct {
 type Close struct {
 	ShipID           string `json:"ship_id"`                     // id of ship being ordered
 	TargetID         string `json:"target_id"`                   // id of ship or colony to close upon
-	StandoffDistance int    `json:"standoff_distance,omitempty"` // optional distinance to stand off from target
+	StandoffDistance int    `json:"standoff_distance,omitempty"` // optional distance to stand off from target
 }
 
 // CloseProximityTargeting order...
