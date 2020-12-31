@@ -33,7 +33,7 @@ type Name struct {
 
 // Name changes the name assigned to a ship, colony, star, system, planet, or polity.
 //
-// 1. Entity identified by EntityID
+// 1. Entity identified by EntityID must be a ship, colony, star, system, planet, or polity
 // 2. The name will be converted to valid UTF-8
 // 3. Certain prohibited characters in the name will be replaced with underscores ('_')
 // 4. The name must not be empty.
