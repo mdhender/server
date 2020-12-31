@@ -67,6 +67,13 @@ func (st *State) PostOrders(orders Orders) error {
 			if err := st.Junk(orderedBy, order.Junk.ActorID, order.Junk.AssetID); err != nil {
 				errs = append(errs, err)
 			}
+		case order.Name != nil:
+			if debug {
+				log.Printf("[orders] %4d name %v\n", i, *order.Name)
+			}
+			if err := st.Name(orderedBy, order.Name.EntityID, order.Name.Type, order.Name.Name); err != nil {
+				errs = append(errs, err)
+			}
 		case order.Run != nil:
 			if debug {
 				log.Printf("[orders] %4d run %v\n", i, *order.Run)
