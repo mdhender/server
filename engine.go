@@ -64,6 +64,13 @@ func (st *State) PostOrders(orders Orders) error {
 			if debug {
 				log.Printf("[orders] %4d run %v\n", i, *order.Run)
 			}
+		case order.Scrap != nil:
+			if debug {
+				log.Printf("[orders] %4d scrap %v\n", i, *order.Scrap)
+			}
+			if err := st.Scrap(orderedBy, order.Scrap.ActorID, order.Scrap.Item, order.Scrap.TechLevel, order.Scrap.Quantity); err != nil {
+				errs = append(errs, err)
+			}
 		case order.Undock != nil:
 			if debug {
 				log.Printf("[orders] %4d undock %v\n", i, *order.Undock)

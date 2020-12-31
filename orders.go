@@ -518,14 +518,6 @@ type Run struct {
 	TargetID string `json:"target_id"` // id of S/C to run from
 }
 
-// Scrap order...
-type Scrap struct {
-	SourceID  string `json:"source_id"` // id of ship or colony being ordered
-	Item      string `json:"item"`
-	TechLevel int    `json:"tech_level"`
-	Quantity  int    `json:"quantity"`
-}
-
 // SetUp order...
 type SetUp struct {
 	SourceID     string `json:"source_id"` // id of ship or colony being ordered
