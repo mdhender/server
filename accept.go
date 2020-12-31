@@ -49,10 +49,10 @@ func (st *State) Accept(orderedByID, assetID string) error {
 		asset.controlledBy = colony.controlledBy
 		asset.colony = colony
 	} else if ship := st.LookupShip(assetID); ship != nil {
-		asset.controlledBy = asset.ship.controlledBy
+		asset.controlledBy = ship.controlledBy
 		asset.ship = ship
 	} else {
-		return fmt.Errorf("invalid asset %q: %w", assetID, ERRBADREQUEST)
+		return fmt.Errorf("invalid actor %q: %w", assetID, ERRBADREQUEST)
 	}
 
 	// asset must be controlled by a viceroy of the order issuer's polity

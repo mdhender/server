@@ -54,7 +54,7 @@ func (st *State) Give(orderedByID, assetID, targetID string) error {
 		asset.colony = colony
 		asset.system = colony.system
 	} else if ship := st.LookupShip(assetID); ship != nil {
-		asset.controlledBy = asset.ship.controlledBy
+		asset.controlledBy = ship.controlledBy
 		asset.ship = ship
 		asset.system = ship.system
 	} else {
