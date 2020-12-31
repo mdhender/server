@@ -399,13 +399,6 @@ type Move struct {
 	Offset int    `json:"offset"`  // distance (in tactical distance units) to arrive from destination
 }
 
-// Note order...
-// Text must be UTF-8 and is truncated at 200 runes.
-type Note struct {
-	SourceID string `json:"source_id"` // id of ship or colony being ordered
-	Text     string `json:"text"`      // text to be displayed on Owner's report for the ship or colony
-}
-
 // OffensiveSupport order...
 type OffensiveSupport struct {
 	SourceID string `json:"source_id"` // id of ship or colony being ordered

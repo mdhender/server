@@ -19,6 +19,7 @@ package engine
 import (
 	"fmt"
 	"log"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -152,6 +153,7 @@ type Colony struct {
 	system         *System
 	homePortTo     []*Ship
 	name           string
+	note           Text
 }
 
 type EngineUnit struct{}
@@ -168,6 +170,7 @@ type Ship struct {
 	system       *System
 	homePort     *Colony
 	name         string
+	note         Text
 }
 
 type StructuralUnit struct{}
@@ -241,16 +244,29 @@ func (st *State) assignHomePort(ship *Ship, colony *Colony) error {
 func (st *State) assignColonyName(colony *Colony, name string) error {
 	if colony == nil {
 		return fmt.Errorf("missing colony: %w", ERRBADREQUEST)
-	} else if name == "" || len(name) > 50 {
+	}
+	if name = strings.TrimSpace(name); name == "" || len(name) > 50 {
 		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
 	}
 	return fmt.Errorf("State.assignColonyName: %w", ERRNOTIMPLEMENTED)
 }
 
+func (st *State) assignColonyNote(colony *Colony, note Text) error {
+	if colony == nil {
+		return fmt.Errorf("missing colony: %w", ERRBADREQUEST)
+	}
+	if note = note.TrimSpace(); len(note.text) > 200 {
+		return fmt.Errorf("invalid note: %w", ERRBADREQUEST)
+	}
+	colony.note = note
+	return nil
+}
+
 func (st *State) assignPlanetName(planet *Planet, name string) error {
 	if planet == nil {
 		return fmt.Errorf("missing planet: %w", ERRBADREQUEST)
-	} else if name == "" || len(name) > 50 {
+	}
+	if name = strings.TrimSpace(name); name == "" || len(name) > 50 {
 		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
 	}
 	return fmt.Errorf("State.assignPlanetName: %w", ERRNOTIMPLEMENTED)
@@ -259,7 +275,8 @@ func (st *State) assignPlanetName(planet *Planet, name string) error {
 func (st *State) assignPolityName(polity *Polity, name string) error {
 	if polity == nil {
 		return fmt.Errorf("missing polity: %w", ERRBADREQUEST)
-	} else if name == "" || len(name) > 50 {
+	}
+	if name = strings.TrimSpace(name); name == "" || len(name) > 50 {
 		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
 	}
 	return fmt.Errorf("State.assignPolityName: %w", ERRNOTIMPLEMENTED)
@@ -268,16 +285,29 @@ func (st *State) assignPolityName(polity *Polity, name string) error {
 func (st *State) assignShipName(ship *Ship, name string) error {
 	if ship == nil {
 		return fmt.Errorf("missing ship: %w", ERRBADREQUEST)
-	} else if name == "" || len(name) > 50 {
+	}
+	if name = strings.TrimSpace(name); name == "" || len(name) > 50 {
 		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
 	}
 	return fmt.Errorf("State.assignShipName: %w", ERRNOTIMPLEMENTED)
 }
 
+func (st *State) assignShipNote(ship *Ship, note Text) error {
+	if ship == nil {
+		return fmt.Errorf("missing ship: %w", ERRBADREQUEST)
+	}
+	if note = note.TrimSpace(); len(note.text) > 200 {
+		return fmt.Errorf("invalid note: %w", ERRBADREQUEST)
+	}
+	ship.note = note
+	return nil
+}
+
 func (st *State) assignStarName(star *Star, name string) error {
 	if star == nil {
 		return fmt.Errorf("missing star: %w", ERRBADREQUEST)
-	} else if name == "" || len(name) > 50 {
+	}
+	if name = strings.TrimSpace(name); name == "" || len(name) > 50 {
 		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
 	}
 	return fmt.Errorf("State.assignStarName: %w", ERRNOTIMPLEMENTED)
@@ -286,7 +316,8 @@ func (st *State) assignStarName(star *Star, name string) error {
 func (st *State) assignSystemName(system *System, name string) error {
 	if system == nil {
 		return fmt.Errorf("missing system: %w", ERRBADREQUEST)
-	} else if name == "" || len(name) > 50 {
+	}
+	if name = strings.TrimSpace(name); name == "" || len(name) > 50 {
 		return fmt.Errorf("invalid name %q: %w", name, ERRBADREQUEST)
 	}
 	return fmt.Errorf("State.assignSystemName: %w", ERRNOTIMPLEMENTED)

@@ -74,6 +74,18 @@ func (st *State) PostOrders(orders Orders) error {
 			if err := st.Name(orderedBy, order.Name.EntityID, order.Name.Type, order.Name.Name); err != nil {
 				errs = append(errs, err)
 			}
+		case order.Note != nil:
+			if debug {
+				log.Printf("[orders] %4d note %v\n", i, *order.Note)
+			}
+			if note, err := NewText(order.Note.Text); err != nil {
+				errs = append(errs, err)
+			} else {
+				log.Printf("[todo] State.PostOrders: considering untaining note text\n")
+				if err = st.Note(orderedBy, order.Note.TargetID, note); err != nil {
+					errs = append(errs, err)
+				}
+			}
 		case order.PermissionToColonize != nil:
 			if debug {
 				log.Printf("[orders] %4d permissionToColonize %v\n", i, *order.PermissionToColonize)
