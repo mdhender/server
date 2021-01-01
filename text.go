@@ -19,6 +19,7 @@ package engine
 import (
 	"fmt"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -76,4 +77,36 @@ func (t Text) Untaint() Text {
 		untainted: true,
 		text:      t.text,
 	}
+}
+
+// sanitize is an attempt to replace problematic characters with an underscore.
+// it also forces the string to be valid utf-8.'
+// for some reason, it also avoids runs of replacement characters.
+func sanitize(s string) string {
+	var dst, prior string
+	for src := []byte(s); len(src) != 0; {
+		r, w := utf8.DecodeRune(src)
+		switch r {
+		case utf8.RuneError:
+			if prior != " " {
+				dst, prior = dst+" ", " "
+			}
+		case '\\', '<', '>', '%':
+			if prior != "_" {
+				dst, prior = dst+"_", "_"
+			}
+		default:
+			if unicode.IsPrint(r) {
+				dst += string(r)
+			} else if unicode.IsSpace(r) {
+				if prior != " " {
+					dst, prior = dst+" ", " "
+				}
+			} else if prior != "_" {
+				dst, prior = dst+"_", "_"
+			}
+		}
+		src = src[w:]
+	}
+	return dst
 }

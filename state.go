@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"unicode"
-	"unicode/utf8"
 )
 
 type State struct {
@@ -30,14 +28,10 @@ type State struct {
 		ids map[string]interface{}
 	}
 	polities []*Polity
+	colonies []*Colony
+	ships    []*Ship
 
 	orders Orders
-}
-
-func NewState() *State {
-	st := &State{}
-	st.maps.ids = make(map[string]interface{})
-	return st
 }
 
 func (st *State) Lookup(id string) (o interface{}, ok bool) {
@@ -83,92 +77,150 @@ func (st *State) LookupShip(id string) *Ship {
 	return nil
 }
 
+// System is a group of 1 to 5 Stars.
+// Sometimes called "a star system."
 type System struct {
-	ID     string
+	id     string
 	name   string
-	Coords struct {
-		X int
-		Y int
-		Z int
+	coords struct {
+		x int
+		y int
+		z int
 	}
-	Stars []*Star
+	stars []*Star
 }
 
-// I think that orbit 11 is the default jump point target.
 type Star struct {
-	ID     string
-	Name   string
-	Orbits [11]*Orbit
+	id     string
+	name   string
+	orbits [10]*Orbit
 }
 
 type Orbit struct {
-	ID       string
-	Planet   *Planet
-	Colonies []*Colony
-	Ships    []*Ship
+	id       string
+	planet   *Planet
+	colonies []*Colony
+	ships    []*Ship
 }
 
 type Planet struct {
-	ID           string
-	Type         PlanetType
-	Habitability int // range from 0 to 25
-	Deposits     []*Resource
+	id           string
+	kind         PlanetKind
+	habitability int // range from 0 to 25
+	deposits     []*Resource
 	colonies     []*Colony
 }
 
 type Polity struct {
-	ID   string
-	Name string
-	Home struct {
-		System *System
-		World  *Planet
+	id   string
+	name string
+	home struct {
+		system *System
+		world  *Planet
+		colony *Colony
 	}
-	// controls and controlled-by allow the players to join and
-	// quit games in progress. there should never be more than
-	// one level in this hierarchy.
-	controls  []*Polity // controls these polities
-	viceroyOf *Polity   // controlled by this polity
+	controls struct {
+		colonies []*Colony
+		ships    []*Ship
+		polities []*Polity // there should never be more than one level in this hierarchy.
+	}
+	viceroyOf *Polity // controlled by this polity
 	diplomacy map[string]DiplomaticStatus
+	seq       struct {
+		colony int
+		ship   int
+	}
 }
 
 func (p *Polity) isAllied(t *Polity) bool {
 	if p == nil || t == nil {
 		return false
 	}
-	return p.diplomacy[t.ID] == ALLY && t.diplomacy[p.ID] == ALLY
+	return p.diplomacy[t.id] == ALLY && t.diplomacy[p.id] == ALLY
+}
+
+func (p *Polity) nextColonyNumber() string {
+	p.seq.colony++
+	return fmt.Sprintf("C%d", p.seq.colony)
+}
+
+func (p *Polity) nextShipNumber() string {
+	p.seq.ship++
+	return fmt.Sprintf("C%d", p.seq.ship)
 }
 
 // Resource is any resource that can be mined.
 type Resource struct {
-	ID              string
-	Type            ResourceType
-	YieldPct        float64
-	Unlimited       bool
-	InitialAmount   int64
-	AmountRemaining int64
+	id              string
+	kind            ResourceKind
+	yieldPct        float64
+	unlimited       bool
+	initialAmount   int64
+	amountRemaining int64
 }
 
 type AutomationUnit struct{}
 type Colony struct {
+	id             string
+	kind           ColonyKind
+	number         string
 	originalPolity *Polity // set only if this is a Home Colony?
 	controlledBy   *Polity
 	system         *System
 	homePortTo     []*Ship
 	name           string
 	note           Text
+	units          struct {
+		farms      []FarmUnit
+		mines      []MineUnit
+		population struct {
+			construction  int
+			professionals int
+			soldiers      int
+			spies         int
+			trainees      int
+			unskilled     int
+			others        int
+		}
+	}
+	rebels struct {
+		construction  float64
+		professionals float64
+		soldiers      float64
+		spies         float64
+		trainees      float64
+		unskilled     float64
+		others        float64
+	}
+	storage struct {
+		food     int
+		fuel     int
+		gold     int
+		metal    int
+		nonmetal int
+	}
 }
 
 type EngineUnit struct{}
 type FactoryUnit struct{}
-type FarmUnit struct{}
-type MineUnit struct{}
+type FarmUnit struct {
+	techLevel int
+	quantity  int
+}
+type MineUnit struct {
+	techLevel int
+	quantity  int
+	resource  *Resource // resource being mined
+}
 type MissileUnit struct{}
 type AntiMissileUnit struct{}
 type PopulationUnit struct{}
 type RobotUnit struct{}
 
 type Ship struct {
+	id           string
 	controlledBy *Polity
+	number       string
 	system       *System
 	homePort     *Colony
 	name         string
@@ -189,7 +241,7 @@ func (c *Colony) acceptsOrdersFrom(p *Polity) bool {
 	if c == nil {
 		return false
 	}
-	for _, viceroy := range p.controls {
+	for _, viceroy := range p.controls.polities {
 		if c.controlledBy == viceroy {
 			return true
 		}
@@ -202,7 +254,7 @@ func (s *Ship) acceptsOrdersFrom(p *Polity) bool {
 	if s == nil {
 		return false
 	}
-	for _, viceroy := range p.controls {
+	for _, viceroy := range p.controls.polities {
 		if s.controlledBy == viceroy {
 			return true
 		}
@@ -370,13 +422,13 @@ func (st *State) transferPolity(from, to *Polity) error {
 
 	from.diplomacy = make(map[string]DiplomaticStatus)
 	for _, polity := range st.polities {
-		from.diplomacy[polity.ID] = UNKNOWN
+		from.diplomacy[polity.id] = UNKNOWN
 	}
-	from.diplomacy[to.ID] = ALLY
+	from.diplomacy[to.id] = ALLY
 	if to.diplomacy == nil {
 		to.diplomacy = make(map[string]DiplomaticStatus)
 	}
-	to.diplomacy[from.ID] = ALLY
+	to.diplomacy[from.id] = ALLY
 
 	return nil
 }
@@ -404,7 +456,7 @@ func (st *State) transferShip(ship *Ship, from, to *Polity) error {
 // has with the target.
 func (p *Polity) diplomaticStatus(target *Polity) DiplomaticStatus {
 	if p.diplomacy != nil {
-		if ds, ok := p.diplomacy[target.ID]; ok {
+		if ds, ok := p.diplomacy[target.id]; ok {
 			return ds
 		}
 	}
@@ -430,51 +482,19 @@ func (p *Polity) isViceroyOf(ruler *Polity) bool {
 		return false
 	}
 	if p.viceroyOf == ruler {
-		for _, pp := range ruler.controls {
+		for _, pp := range ruler.controls.polities {
 			if pp == p {
 				return true
 			}
 		}
-		log.Printf("[bug] Polity.isViceroy: assert(ruler.controls contains p.viceroyOf)\n")
+		log.Printf("[bug] Polity.isViceroy: assert(ruler.controls.polities contains p.viceroyOf)\n")
 		return false
 	}
-	for _, pp := range ruler.controls {
+	for _, pp := range ruler.controls.polities {
 		if pp == p {
-			log.Printf("[bug] Polity.isViceroy: assert(ruler.controls does not contain p.viceroyOf)\n")
+			log.Printf("[bug] Polity.isViceroy: assert(ruler.controls.polities does not contain p.viceroyOf)\n")
 			return false
 		}
 	}
 	return false
-}
-
-// sanitize is an attempt to replace problematic characters with an underscore.
-// it also forces the string to be valid utf-8.'
-// for some reason, it also avoids runs of replacement characters.
-func sanitize(s string) string {
-	var dst, prior string
-	for src := []byte(s); len(src) != 0; {
-		r, w := utf8.DecodeRune(src)
-		switch r {
-		case utf8.RuneError:
-			if prior != " " {
-				dst, prior = dst+" ", " "
-			}
-		case '\\', '<', '>', '%':
-			if prior != "_" {
-				dst, prior = dst+"_", "_"
-			}
-		default:
-			if unicode.IsPrint(r) {
-				dst += string(r)
-			} else if unicode.IsSpace(r) {
-				if prior != " " {
-					dst, prior = dst+" ", " "
-				}
-			} else if prior != "_" {
-				dst, prior = dst+"_", "_"
-			}
-		}
-		src = src[w:]
-	}
-	return dst
 }

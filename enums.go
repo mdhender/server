@@ -17,11 +17,16 @@
 package engine
 
 // enums
+type ColonyKind int
 type DiplomaticStatus int
-type PlanetType int
-type ResourceType int
+type PlanetKind int
+type ResourceKind int
 
 const (
+	OPEN ColonyKind = iota
+	ENCLOSED
+	ORBITING
+
 	// order is important - diplomacy starts at UNKNOWN and increases
 	// to ALLY, which is the highest level.
 	UNKNOWN      DiplomaticStatus = iota
@@ -29,11 +34,11 @@ const (
 	FRIEND                        // allows assets to be transferred
 	ALLY
 
-	ASTEROIDBELT PlanetType = iota
+	ASTEROIDBELT PlanetKind = iota
 	GASGIANT
 	TERRESTRIAL
 
-	FUEL ResourceType = iota
+	FUEL ResourceKind = iota
 	GOLD
 	METAL
 	NONMETAL

@@ -351,6 +351,12 @@ func (st *State) junkStage(debug bool) []error {
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
 
+func (st *State) loadCargoStage(debug bool) []error {
+	stageName := "loadCargo"
+	var errs []error
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
 func (st *State) mergeStage(debug bool) []error {
 	stageName := "merge"
 	var errs []error
@@ -449,6 +455,12 @@ func (st *State) permissionOrdersStage(debug bool) []error {
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
 
+func (st *State) pickupStage(debug bool) []error {
+	stageName := "pickup"
+	var errs []error
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
 // Probe Stage
 // = Probes
 // == Orbit Probe
@@ -486,17 +498,37 @@ func (st *State) produceOutputStage(debug bool) []error {
 }
 
 // Production Stage
+// . Cycles Through Colonies:
+//   .. Sums and reports Professionals used to pilot transports.
+//   .. Collects data for surveys.
+//   .. Totals automation capacity and life support capacity.
+//   .. Does production in the following order:
+//      ... Power Production
+//      ... Mine Production
+//      ... Farm Production
+//      ... Laboratory Production
+//      ... Factory Production
+//   .. Food Consumption
+//   .. Consumer Goods Consumption (includes ships calling this colony home port)
+//   .. Rebel Actions
+//   .. Population Changes (Births, Deaths, Graduations & Retirements)
+//   .. Statistics updates
+// . Cycles Through Ships:
+//   .. Sums and reports Professionals used to pilot transports.
+//   .. Totals automation capacity and life support capacity.
+//   .. Farm Production
+//   .. Food Consumption
+//   .. Rebel Actions
+//   .. Population Changes (Deaths Graduations Retirements)
+//   .. Statistics updates
 func (st *State) productionStage(debug bool) []error {
 	stageName := "production"
 	var errs []error
-	for i, order := range st.orders {
-		switch {
-		case order.Debug != nil:
-			debug = order.Debug.On
-			if debug {
-				log.Printf("[stage:%s] %4d debug %v\n", stageName, i, *order.Debug)
-			}
-		}
+	for _, colony := range st.colonies {
+		log.Printf("[stage:%s] colony %q\n", colony.name)
+	}
+	for _, ship := range st.ships {
+		log.Printf("[stage:%s] colony %q\n", ship.name)
 	}
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
@@ -598,6 +630,12 @@ func (st *State) shipTravelStage(debug bool) []error {
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
 
+func (st *State) shortagesStage(debug bool) []error {
+	stageName := "shortages"
+	var errs []error
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
 // Surveys and Probes Stage
 // = S/C Probes Only
 // = Survey
@@ -635,14 +673,68 @@ func (st *State) surveysAndProbesStage(debug bool) []error {
 func (st *State) transferStage(debug bool) []error {
 	stageName := "transfer"
 	var errs []error
-	for i, order := range st.orders {
-		switch {
-		case order.Debug != nil:
-			debug = order.Debug.On
-			if debug {
-				log.Printf("[stage:%s] %4d debug %v\n", stageName, i, *order.Debug)
-			}
-		}
+	for _, err := range st.unloadCargoStage(debug) {
+		errs = append(errs, err)
 	}
+	for _, err := range st.transferUnitsStage(debug) {
+		errs = append(errs, err)
+	}
+	for _, err := range st.pickupStage(debug) {
+		errs = append(errs, err)
+	}
+	for _, err := range st.loadCargoStage(debug) {
+		errs = append(errs, err)
+	}
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+func (st *State) transferAndPickupStage(debug bool) []error {
+	stageName := "transferAndPickup"
+	var errs []error
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+func (st *State) transferUnitsStage(debug bool) []error {
+	stageName := "transferUnits"
+	var errs []error
+	for _, err := range st.transferAndPickupStage(debug) {
+		errs = append(errs, err)
+	}
+	for _, err := range st.transportsStage(debug) {
+		errs = append(errs, err)
+	}
+	for _, err := range st.transportCapacityStage(debug) {
+		errs = append(errs, err)
+	}
+	for _, err := range st.transferOrPickupTransportsStage(debug) {
+		errs = append(errs, err)
+	}
+	for _, err := range st.shortagesStage(debug) {
+		errs = append(errs, err)
+	}
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+func (st *State) transferOrPickupTransportsStage(debug bool) []error {
+	stageName := "transferOrPickupTransports"
+	var errs []error
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+func (st *State) transportCapacityStage(debug bool) []error {
+	stageName := "transportCapacity"
+	var errs []error
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+func (st *State) transportsStage(debug bool) []error {
+	stageName := "transports"
+	var errs []error
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+func (st *State) unloadCargoStage(debug bool) []error {
+	stageName := "unloadCargo"
+	var errs []error
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
