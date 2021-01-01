@@ -30,6 +30,8 @@ type State struct {
 		ids map[string]interface{}
 	}
 	polities []*Polity
+
+	orders Orders
 }
 
 func NewState() *State {

@@ -16,15 +16,35 @@
 
 package engine
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
-func (st *State) PostOrders(orders Orders) error {
+func (st *State) CheckOrders(orderedByID string, orders Orders) []error {
+	log.Printf("[todo] State.CheckOrders: find a way to reduce duplication on constraint checks for orders\n")
+	var errs []error
+	for i, order := range orders {
+		switch {
+		case order.Debug != nil:
+			// no checks needed
+		case order.Note != nil:
+			if note, err := NewText(order.Note.Text); err != nil {
+				errs = append(errs, fmt.Errorf("%d: %w", i, err))
+			} else if note = note.TrimSpace(); note.Length() > 200 {
+				errs = append(errs, fmt.Errorf("%d: note length must not exceed 200 characters: %w", i, ERRBADREQUEST))
+			}
+		default:
+		}
+	}
+	return errs
+}
+
+func (st *State) PostOrders(orderedByID string, orders Orders) error {
 	// do something with the orders
 	var debug bool
 	var errs []error
 	for i, order := range orders {
-		var orderedBy string // todo: set to the player that issued the order
-
 		switch {
 		case order.Debug != nil:
 			debug = order.Debug.On
@@ -35,7 +55,7 @@ func (st *State) PostOrders(orders Orders) error {
 			if debug {
 				log.Printf("[orders] %4d accept %v\n", *order.Accept)
 			}
-			if err := st.Accept(orderedBy, order.Accept.AssetID); err != nil {
+			if err := st.Accept(orderedByID, order.Accept.AssetID); err != nil {
 				errs = append(errs, err)
 			}
 		case order.DefensiveSupport != nil:
@@ -50,28 +70,28 @@ func (st *State) PostOrders(orders Orders) error {
 			if debug {
 				log.Printf("[orders] %4d give %v\n", i, *order.Give)
 			}
-			if err := st.Give(orderedBy, order.Give.AssetID, order.Give.TargetID); err != nil {
+			if err := st.Give(orderedByID, order.Give.AssetID, order.Give.TargetID); err != nil {
 				errs = append(errs, err)
 			}
 		case order.HomePortChange != nil:
 			if debug {
 				log.Printf("[orders] %4d homePortChange %v\n", i, *order.HomePortChange)
 			}
-			if err := st.HomePortChange(orderedBy, order.HomePortChange.ShipID, order.HomePortChange.ColonyID); err != nil {
+			if err := st.HomePortChange(orderedByID, order.HomePortChange.ShipID, order.HomePortChange.ColonyID); err != nil {
 				errs = append(errs, err)
 			}
 		case order.Junk != nil:
 			if debug {
 				log.Printf("[orders] %4d junk %v\n", i, *order.Junk)
 			}
-			if err := st.Junk(orderedBy, order.Junk.ActorID, order.Junk.AssetID); err != nil {
+			if err := st.Junk(orderedByID, order.Junk.ActorID, order.Junk.AssetID); err != nil {
 				errs = append(errs, err)
 			}
 		case order.Name != nil:
 			if debug {
 				log.Printf("[orders] %4d name %v\n", i, *order.Name)
 			}
-			if err := st.Name(orderedBy, order.Name.EntityID, order.Name.Type, order.Name.Name); err != nil {
+			if err := st.Name(orderedByID, order.Name.EntityID, order.Name.Type, order.Name.Name); err != nil {
 				errs = append(errs, err)
 			}
 		case order.Note != nil:
@@ -82,7 +102,7 @@ func (st *State) PostOrders(orders Orders) error {
 				errs = append(errs, err)
 			} else {
 				log.Printf("[todo] State.PostOrders: considering untaining note text\n")
-				if err = st.Note(orderedBy, order.Note.TargetID, note); err != nil {
+				if err = st.Note(orderedByID, order.Note.TargetID, note); err != nil {
 					errs = append(errs, err)
 				}
 			}
@@ -90,7 +110,7 @@ func (st *State) PostOrders(orders Orders) error {
 			if debug {
 				log.Printf("[orders] %4d permissionToColonize %v\n", i, *order.PermissionToColonize)
 			}
-			if err := st.PermissionToColonize(orderedBy, order.PermissionToColonize.PlanetID, order.PermissionToColonize.ShipID); err != nil {
+			if err := st.PermissionToColonize(orderedByID, order.PermissionToColonize.PlanetID, order.PermissionToColonize.ShipID); err != nil {
 				errs = append(errs, err)
 			}
 		case order.Run != nil:
@@ -101,7 +121,7 @@ func (st *State) PostOrders(orders Orders) error {
 			if debug {
 				log.Printf("[orders] %4d scrap %v\n", i, *order.Scrap)
 			}
-			if err := st.Scrap(orderedBy, order.Scrap.ActorID, order.Scrap.Item, order.Scrap.TechLevel, order.Scrap.Quantity); err != nil {
+			if err := st.Scrap(orderedByID, order.Scrap.ActorID, order.Scrap.Item, order.Scrap.TechLevel, order.Scrap.Quantity); err != nil {
 				errs = append(errs, err)
 			}
 		case order.Undock != nil:

@@ -49,6 +49,7 @@ func (o Orders) SortStable() {
 // The consumer of an Order must test all the properties for non-nil to determine which one to process.
 type Order struct {
 	priority                            int                                  // priority for sorting orders
+	issuedBy                            string                               // polity that issued the order
 	Accept                              *Accept                              `json:"accept,omitempty"`
 	AddOn                               *AddOn                               `json:"add_on,omitempty"`
 	AfterManeuverEnergyWeaponFire       *AfterManeuverEnergyWeaponFire       `json:"after_maneuver_energy_weapon_fire,omitempty"`
