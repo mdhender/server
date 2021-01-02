@@ -125,21 +125,23 @@ func (st *State) buildChangeStage(debug bool) []error {
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
 
-// . Cycles Through Colonies:
-//   .. Sums and reports Professionals used to pilot transports.
-//   .. Collects data for surveys.
-//   .. Totals automation capacity and life support capacity.
-//   .. Does production in the following order:
-//      ... Power Production
-//      ... Mine Production
-//      ... Farm Production
-//      ... Laboratory Production
-//      ... Factory Production
-//   .. Food Consumption
-//   .. Consumer Goods Consumption (includes ships calling this colony home port)
-//   .. Rebel Actions
-//   .. Population Changes (Births, Deaths, Graduations & Retirements)
-//   .. Statistics updates
+// colonyProductionStage calculates production and consumption for all colonies.
+//
+// For each colony:
+//   1. Sums and reports Professionals used to pilot transports.
+//   2. Collects data for surveys.
+//   3. Totals automation capacity and life support capacity.
+//   4. Does production in the following order:
+//      a. Power Production
+//      b. Mine Production
+//      c. Farm Production
+//      d. Laboratory Production
+//      e. Factory Production
+//   5. Food Consumption
+//   6. Consumer Goods Consumption (includes ships calling this colony home port)
+//   7. Rebel Actions
+//   8. Population Changes (Births, Deaths, Graduations & Retirements)
+//   9. Statistics updates
 func (st *State) colonyProductionStage(debug bool) []error {
 	stageName := "colonyProduction"
 	var errs []error
@@ -162,6 +164,10 @@ func (st *State) colonyProductionStage(debug bool) []error {
 
 		// calculate food needed
 		unitsNeeded := totalPopulation
+		unitsRationed := int(float64(unitsNeeded) * colony.ration)
+		if unitsRationed != unitsNeeded {
+			// potential for starvation
+		}
 
 		// consume from production before taking from storage
 		if unitsProduced >= unitsNeeded {
@@ -175,8 +181,9 @@ func (st *State) colonyProductionStage(debug bool) []error {
 			}
 		}
 
-		if unitsNeeded != 0 {
-			// starvation
+		if unitsNeeded != 0 { // calculate deaths due to starvation
+		}
+		if unitsProduced != 0 { // move to storage, any excess is wasted.
 		}
 	}
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))

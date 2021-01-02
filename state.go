@@ -199,6 +199,8 @@ type Colony struct {
 		metal    int
 		nonmetal int
 	}
+	// percent of a full food allotment to be dispersed each turn
+	ration float64
 }
 
 type EngineUnit struct{}
