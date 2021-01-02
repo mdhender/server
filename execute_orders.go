@@ -147,14 +147,6 @@ func (st *State) colonyProductionStage(debug bool) []error {
 	var errs []error
 	for _, colony := range st.colonies {
 		log.Printf("[stage:%s] colony %q\n", stageName, colony.name)
-		var totalPopulation int
-		totalPopulation += colony.units.population.construction
-		totalPopulation += colony.units.population.professionals
-		totalPopulation += colony.units.population.soldiers
-		totalPopulation += colony.units.population.spies
-		totalPopulation += colony.units.population.trainees
-		totalPopulation += colony.units.population.unskilled
-		totalPopulation += colony.units.population.others
 
 		// farm production
 		var unitsProduced, unitsStored int
@@ -163,25 +155,25 @@ func (st *State) colonyProductionStage(debug bool) []error {
 		}
 
 		// calculate food needed
-		unitsNeeded := totalPopulation
-		unitsRationed := int(float64(unitsNeeded) * colony.ration)
-		if unitsRationed != unitsNeeded {
+		minNeeded, maxNeeded := colony.population.FoodNeeded()
+		unitsRationed := int(float64(maxNeeded) * colony.ration)
+		if unitsRationed < minNeeded {
 			// potential for starvation
 		}
 
 		// consume from production before taking from storage
-		if unitsProduced >= unitsNeeded {
-			unitsProduced, unitsNeeded = unitsProduced-unitsNeeded, 0
+		if unitsProduced >= unitsRationed {
+			unitsProduced, unitsRationed = unitsProduced-unitsRationed, 0
 		} else {
-			unitsProduced, unitsNeeded = 0, unitsNeeded-unitsProduced
-			if unitsStored <= unitsNeeded {
-				unitsStored, unitsNeeded = 0, unitsNeeded-unitsStored
+			unitsProduced, unitsRationed = 0, unitsRationed-unitsProduced
+			if unitsStored <= unitsRationed {
+				unitsStored, unitsRationed = 0, unitsRationed-unitsStored
 			} else {
-				unitsStored, unitsNeeded = unitsStored-unitsNeeded, 0
+				unitsStored, unitsRationed = unitsStored-unitsRationed, 0
 			}
 		}
 
-		if unitsNeeded != 0 { // calculate deaths due to starvation
+		if unitsRationed != 0 { // calculate deaths due to starvation
 		}
 		if unitsProduced != 0 { // move to storage, any excess is wasted.
 		}
@@ -673,14 +665,6 @@ func (st *State) shipProductionStage(debug bool) []error {
 	var errs []error
 	for _, ship := range st.ships {
 		log.Printf("[stage:%s] ship %q\n", stageName, ship.name)
-		var totalPopulation int
-		totalPopulation += ship.units.population.construction
-		totalPopulation += ship.units.population.professionals
-		totalPopulation += ship.units.population.soldiers
-		totalPopulation += ship.units.population.spies
-		totalPopulation += ship.units.population.trainees
-		totalPopulation += ship.units.population.unskilled
-		totalPopulation += ship.units.population.others
 
 		// farm production
 		var unitsProduced, unitsStored int
@@ -689,28 +673,25 @@ func (st *State) shipProductionStage(debug bool) []error {
 		}
 
 		// calculate food needed
-		unitsNeeded, unitsConsumed := totalPopulation, 0
-		unitsRationed := int(float64(unitsNeeded) * ship.ration)
-		if unitsRationed != unitsNeeded {
+		minNeeded, maxNeeded := ship.population.FoodNeeded()
+		unitsRationed := int(float64(maxNeeded) * ship.ration)
+		if unitsRationed != minNeeded {
 			// potential for starvation
 		}
 
 		// consume food from production before taking any from storage
-		if unitsProduced >= unitsNeeded {
-			unitsProduced, unitsNeeded = unitsProduced-unitsNeeded, 0
+		if unitsProduced >= minNeeded {
+			unitsProduced, minNeeded = unitsProduced-minNeeded, 0
 		} else {
-			unitsProduced, unitsNeeded = 0, unitsNeeded-unitsProduced
-			if unitsStored <= unitsNeeded {
-				unitsStored, unitsNeeded = 0, unitsNeeded-unitsStored
+			unitsProduced, minNeeded = 0, minNeeded-unitsProduced
+			if unitsStored <= minNeeded {
+				unitsStored, minNeeded = 0, minNeeded-unitsStored
 			} else {
-				unitsStored, unitsNeeded = unitsStored-unitsNeeded, 0
+				unitsStored, minNeeded = unitsStored-minNeeded, 0
 			}
 		}
 
-		if unitsConsumed != 0 {
-			// okay
-		}
-		if unitsNeeded != 0 { // calculate deaths due to starvation
+		if minNeeded != 0 { // calculate deaths due to starvation
 		}
 		if unitsProduced != 0 { // move to storage, any excess is wasted.
 		}

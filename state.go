@@ -170,18 +170,10 @@ type Colony struct {
 	homePortTo     []*Ship
 	name           string
 	note           Text
+	population     Population
 	units          struct {
-		farms      []FarmUnit
-		mines      []MineUnit
-		population struct {
-			construction  int
-			professionals int
-			soldiers      int
-			spies         int
-			trainees      int
-			unskilled     int
-			others        int
-		}
+		farms []FarmUnit
+		mines []MineUnit
 	}
 	rebels struct {
 		construction  float64
@@ -224,7 +216,30 @@ type MineUnit struct {
 }
 type MissileUnit struct{}
 type AntiMissileUnit struct{}
-type PopulationUnit struct{}
+type Population struct {
+	construction  int
+	professionals int
+	soldiers      int
+	spies         int
+	trainees      int
+	unskilled     int
+	others        int
+	total         int
+}
+
+// FoodNeeded returns the number of food units needed to fully feed
+// a given population and the amount needed to prevent starvation.
+// Exceeding the maximum has no game effect.
+func (p Population) FoodNeeded() (min, max int) {
+	if min = p.total / 16; min*16 != p.total {
+		min++
+	}
+	if max = p.total / 4; max*4 != p.total {
+		max++
+	}
+	return min, max
+}
+
 type RobotUnit struct{}
 
 type Ship struct {
@@ -235,17 +250,9 @@ type Ship struct {
 	homePort     *Colony
 	name         string
 	note         Text
+	population   Population
 	units        struct {
-		farms      []FarmUnit
-		population struct {
-			construction  int
-			professionals int
-			soldiers      int
-			spies         int
-			trainees      int
-			unskilled     int
-			others        int
-		}
+		farms []FarmUnit
 	}
 	// percent of a full food allotment to be dispersed each turn
 	ration float64

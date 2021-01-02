@@ -61,70 +61,64 @@ func (st *State) MakeColony(kind ColonyKind, polity *Polity) *Colony {
 	return colony
 }
 
-func (st *State) MakeHomePlanet(polity *Polity) *Planet {
+func (st *State) MakeHomePlanet(polity *Polity, scarcity bool) *Planet {
 	planet := &Planet{id: uuid.New().String()}
 	st.maps.ids[planet.id] = planet
 	planet.kind = TERRESTRIAL
 	planet.habitability = 25 // in tens of millions
 
-	colony := st.MakeColony(OPEN, polity)
-	colony.originalPolity = polity
-	colony.units.population.construction = 20_000
-	colony.units.population.professionals = 2_000_000
-	colony.units.population.soldiers = 2_500_000
-	colony.units.population.unskilled = 6_000_000
-	colony.units.population.others = 5_900_000
-	colony.storage.food = 3_000_000
-	colony.storage.fuel = 2_000_000
-	colony.storage.gold = 50_000
-	colony.storage.metal = 4_000_000
-	colony.storage.nonmetal = 4_000_000
-
-	orbitingColony := st.MakeColony(ORBITING, polity)
-	orbitingColony.units.population.construction = 10_000
-	orbitingColony.units.population.professionals = 100_000
-	orbitingColony.units.population.soldiers = 150_000
-	orbitingColony.units.population.unskilled = 370_000
-	orbitingColony.units.population.others = 350_000
-	orbitingColony.storage.food = 300_000
-	orbitingColony.storage.fuel = 200_000
-	orbitingColony.storage.gold = 5_000
-	orbitingColony.storage.metal = 400_000
-	orbitingColony.storage.nonmetal = 400_000
-
-	var initialPopulation int
-	initialPopulation += colony.units.population.construction
-	initialPopulation += colony.units.population.professionals
-	initialPopulation += colony.units.population.soldiers
-	initialPopulation += colony.units.population.spies
-	initialPopulation += colony.units.population.trainees
-	initialPopulation += colony.units.population.unskilled
-	initialPopulation += colony.units.population.others
-	initialPopulation += orbitingColony.units.population.construction
-	initialPopulation += orbitingColony.units.population.professionals
-	initialPopulation += orbitingColony.units.population.soldiers
-	initialPopulation += orbitingColony.units.population.spies
-	initialPopulation += orbitingColony.units.population.trainees
-	initialPopulation += orbitingColony.units.population.unskilled
-	initialPopulation += orbitingColony.units.population.others
-
-	// need enough farms to sustain the population.
-	// one population unit is 10_000_000 people.
-	populationUnits := (initialPopulation / 10_000_000) + 1
-	// Each Population Unit consumes 0.25 Food Units per turn.
-	foodUnitsNeeded := (populationUnits / 4) + 1
-	// FARM-1 produces 25 Food Units per turn, which is enough to feed 100 population units
-	farmUnitsNeeded := (foodUnitsNeeded / 25) + 1
-	colony.units.farms = append(colony.units.farms, FarmUnit{techLevel: 1, quantity: farmUnitsNeeded})
+	homeColony := st.MakeColony(OPEN, polity)
+	homeColony.originalPolity = polity
+	homeColony.population.construction = 20_000
+	homeColony.population.professionals = 2_000_000
+	homeColony.population.soldiers = 2_500_000
+	homeColony.population.unskilled = 6_000_000
+	homeColony.population.others = 5_900_000
+	homeColony.population.total = homeColony.population.construction + homeColony.population.professionals + homeColony.population.soldiers + homeColony.population.spies + homeColony.population.trainees + homeColony.population.unskilled + homeColony.population.others
+	homeColony.storage.fuel = 2_000_000
+	homeColony.storage.gold = 50_000
+	homeColony.storage.metal = 4_000_000
+	homeColony.storage.nonmetal = 4_000_000
+	min, max := homeColony.population.FoodNeeded()
+	if scarcity {// put the minimum amount of food needed into storage
+		homeColony.storage.food = min
+	} else {
+		homeColony.storage.food = max
+	}
 
 	for _, kind := range []ResourceKind{FUEL, GOLD, METAL, NONMETAL} {
 		mine := MineUnit{techLevel: 1, quantity: 1, resource: st.MakeResource(kind, true)}
 		planet.deposits = append(planet.deposits, mine.resource)
-		colony.units.mines = append(colony.units.mines, mine)
+		homeColony.units.mines = append(homeColony.units.mines, mine)
 	}
 
+	// every home world gets an orbiting colony
+	orbitingColony := st.MakeColony(ORBITING, polity)
+	orbitingColony.population.construction = 10_000
+	orbitingColony.population.professionals = 100_000
+	orbitingColony.population.soldiers = 150_000
+	orbitingColony.population.unskilled = 370_000
+	orbitingColony.population.others = 350_000
+	orbitingColony.population.total = orbitingColony.population.construction + orbitingColony.population.professionals + orbitingColony.population.soldiers + orbitingColony.population.spies + orbitingColony.population.trainees + orbitingColony.population.unskilled + orbitingColony.population.others
+	orbitingColony.storage.fuel = 200_000
+	orbitingColony.storage.gold = 5_000
+	orbitingColony.storage.metal = 400_000
+	orbitingColony.storage.nonmetal = 400_000
+	min, max = orbitingColony.population.FoodNeeded()
+	if scarcity {// put the minimum amount of food needed into storage
+		orbitingColony.storage.food = min
+	} else {
+		orbitingColony.storage.food = max
+	}
+
+	// need enough farms to produce enough food to sustain the population on the planet and in orbit.
+	// scarcity impacts the total number of farms because it is based on the amount allocated to storage.
+	// FARM-1 produces 25 Food Units per turn; provide a bit of room for growth
+	farmUnitsNeeded := ((homeColony.storage.food+orbitingColony.storage.food) / 25) + 1
+	homeColony.units.farms = append(homeColony.units.farms, FarmUnit{techLevel: 1, quantity: farmUnitsNeeded})
+
 	polity.home.world = planet
-	polity.home.colony = colony
+	polity.home.colony = homeColony
 	return planet
 }
 
