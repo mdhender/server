@@ -207,6 +207,14 @@ type FarmUnit struct {
 	techLevel int
 	quantity  int
 }
+
+func (u FarmUnit) Produce() int {
+	if u.techLevel == 1 {
+		return 25 * u.quantity
+	}
+	return 5 * u.techLevel * u.quantity
+}
+
 type MineUnit struct {
 	techLevel int
 	quantity  int
@@ -225,6 +233,20 @@ type Ship struct {
 	homePort     *Colony
 	name         string
 	note         Text
+	units        struct {
+		farms      []FarmUnit
+		population struct {
+			construction  int
+			professionals int
+			soldiers      int
+			spies         int
+			trainees      int
+			unskilled     int
+			others        int
+		}
+	}
+	// percent of a full food allotment to be dispersed each turn
+	ration float64
 }
 
 type StructuralUnit struct{}

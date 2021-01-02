@@ -125,6 +125,63 @@ func (st *State) buildChangeStage(debug bool) []error {
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
 
+// . Cycles Through Colonies:
+//   .. Sums and reports Professionals used to pilot transports.
+//   .. Collects data for surveys.
+//   .. Totals automation capacity and life support capacity.
+//   .. Does production in the following order:
+//      ... Power Production
+//      ... Mine Production
+//      ... Farm Production
+//      ... Laboratory Production
+//      ... Factory Production
+//   .. Food Consumption
+//   .. Consumer Goods Consumption (includes ships calling this colony home port)
+//   .. Rebel Actions
+//   .. Population Changes (Births, Deaths, Graduations & Retirements)
+//   .. Statistics updates
+func (st *State) colonyProductionStage(debug bool) []error {
+	stageName := "colonyProduction"
+	var errs []error
+	for _, colony := range st.colonies {
+		log.Printf("[stage:%s] colony %q\n", stageName, colony.name)
+		var totalPopulation int
+		totalPopulation += colony.units.population.construction
+		totalPopulation += colony.units.population.professionals
+		totalPopulation += colony.units.population.soldiers
+		totalPopulation += colony.units.population.spies
+		totalPopulation += colony.units.population.trainees
+		totalPopulation += colony.units.population.unskilled
+		totalPopulation += colony.units.population.others
+
+		// farm production
+		var unitsProduced, unitsStored int
+		for _, farm := range colony.units.farms {
+			unitsProduced += farm.Produce()
+		}
+
+		// calculate food needed
+		unitsNeeded := totalPopulation
+
+		// consume from production before taking from storage
+		if unitsProduced >= unitsNeeded {
+			unitsProduced, unitsNeeded = unitsProduced-unitsNeeded, 0
+		} else {
+			unitsProduced, unitsNeeded = 0, unitsNeeded-unitsProduced
+			if unitsStored <= unitsNeeded {
+				unitsStored, unitsNeeded = 0, unitsNeeded-unitsStored
+			} else {
+				unitsStored, unitsNeeded = unitsStored-unitsNeeded, 0
+			}
+		}
+
+		if unitsNeeded != 0 {
+			// starvation
+		}
+	}
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
 // Combat Orders Stage
 // = Prefire Segment
 // == Dodge
@@ -498,37 +555,14 @@ func (st *State) produceOutputStage(debug bool) []error {
 }
 
 // Production Stage
-// . Cycles Through Colonies:
-//   .. Sums and reports Professionals used to pilot transports.
-//   .. Collects data for surveys.
-//   .. Totals automation capacity and life support capacity.
-//   .. Does production in the following order:
-//      ... Power Production
-//      ... Mine Production
-//      ... Farm Production
-//      ... Laboratory Production
-//      ... Factory Production
-//   .. Food Consumption
-//   .. Consumer Goods Consumption (includes ships calling this colony home port)
-//   .. Rebel Actions
-//   .. Population Changes (Births, Deaths, Graduations & Retirements)
-//   .. Statistics updates
-// . Cycles Through Ships:
-//   .. Sums and reports Professionals used to pilot transports.
-//   .. Totals automation capacity and life support capacity.
-//   .. Farm Production
-//   .. Food Consumption
-//   .. Rebel Actions
-//   .. Population Changes (Deaths Graduations Retirements)
-//   .. Statistics updates
 func (st *State) productionStage(debug bool) []error {
 	stageName := "production"
 	var errs []error
-	for _, colony := range st.colonies {
-		log.Printf("[stage:%s] colony %q\n", colony.name)
+	for _, err := range st.colonyProductionStage(debug) {
+		errs = append(errs, err)
 	}
-	for _, ship := range st.ships {
-		log.Printf("[stage:%s] colony %q\n", ship.name)
+	for _, err := range st.shipProductionStage(debug) {
+		errs = append(errs, err)
 	}
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
@@ -613,6 +647,69 @@ func (st *State) setupStage(debug bool) []error {
 				log.Printf("[stage:%s] %4d debug %v\n", stageName, i, *order.Debug)
 			}
 		}
+	}
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+// shipProductionStage calculates production and consumption for all ships.
+//
+// For each ship:
+//   1. Sums and reports Professionals used to pilot transports.
+//   2. Totals automation capacity and life support capacity.
+//   3. Farm Production
+//   4. Food Consumption
+//   5. Rebel Actions
+//   6. Population Changes (Deaths Graduations Retirements)
+//   7. Statistics updates
+func (st *State) shipProductionStage(debug bool) []error {
+	stageName := "shipProduction"
+	var errs []error
+	for _, ship := range st.ships {
+		log.Printf("[stage:%s] ship %q\n", stageName, ship.name)
+		var totalPopulation int
+		totalPopulation += ship.units.population.construction
+		totalPopulation += ship.units.population.professionals
+		totalPopulation += ship.units.population.soldiers
+		totalPopulation += ship.units.population.spies
+		totalPopulation += ship.units.population.trainees
+		totalPopulation += ship.units.population.unskilled
+		totalPopulation += ship.units.population.others
+
+		// farm production
+		var unitsProduced, unitsStored int
+		for _, farm := range ship.units.farms {
+			unitsProduced += farm.Produce()
+		}
+
+		// calculate food needed
+		unitsNeeded, unitsConsumed := totalPopulation, 0
+		unitsRationed := int(float64(unitsNeeded) * ship.ration)
+		if unitsRationed != unitsNeeded {
+			// potential for starvation
+		}
+
+		// consume food from production before taking any from storage
+		if unitsProduced >= unitsNeeded {
+			unitsProduced, unitsNeeded = unitsProduced-unitsNeeded, 0
+		} else {
+			unitsProduced, unitsNeeded = 0, unitsNeeded-unitsProduced
+			if unitsStored <= unitsNeeded {
+				unitsStored, unitsNeeded = 0, unitsNeeded-unitsStored
+			} else {
+				unitsStored, unitsNeeded = unitsStored-unitsNeeded, 0
+			}
+		}
+
+		if unitsConsumed != 0 {
+			// okay
+		}
+		if unitsNeeded != 0 { // calculate deaths due to starvation
+		}
+		if unitsProduced != 0 { // move to storage, any excess is wasted.
+		}
+
+		// rebel actions
+		// population changes
 	}
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }

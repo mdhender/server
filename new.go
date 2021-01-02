@@ -22,6 +22,13 @@ import (
 	"log"
 )
 
+// notes on units...
+// 18_446_744_073_709_551_615 // maximum unsigned 64 bit integer
+//              4_294_967_295 // maximum unsigned 32 bit integer
+//                 10_000_000 // people in one population unit
+//                 40_000_000 // people fed by one food unit per turn
+//              1_000_000_000 // people fed by FARM-1 per turn
+
 func NewState() (*State, error) {
 	st := &State{}
 	st.maps.ids = make(map[string]interface{})
@@ -47,7 +54,7 @@ func NewState() (*State, error) {
 }
 
 func (st *State) MakeColony(kind ColonyKind, polity *Polity) *Colony {
-	colony := &Colony{id: uuid.New().String(), controlledBy: polity}
+	colony := &Colony{id: uuid.New().String(), kind: kind, controlledBy: polity}
 	st.maps.ids[colony.id] = colony
 	colony.number = colony.controlledBy.nextColonyNumber()
 	polity.controls.colonies = append(polity.controls.colonies)
@@ -59,10 +66,6 @@ func (st *State) MakeHomePlanet(polity *Polity) *Planet {
 	st.maps.ids[planet.id] = planet
 	planet.kind = TERRESTRIAL
 	planet.habitability = 25 // in tens of millions
-
-	// 18_446_744_073_709_551_615 // maximum unsigned 64 bit integer
-	//              4_294_967_295 // maximum unsigned 32 bit integer
-	//                 10_000_000 // people in one population unit
 
 	colony := st.MakeColony(OPEN, polity)
 	colony.originalPolity = polity
