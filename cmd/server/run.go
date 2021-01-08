@@ -17,6 +17,8 @@
 package main
 
 import (
+	"fmt"
+	engine "github.com/mdhender/server"
 	"github.com/mdhender/server/internal/storage/memory"
 	"log"
 	"net/http"
@@ -46,6 +48,46 @@ func run(cfg *config) error {
 		return err
 	}
 	srv.Handler = CorsHandler(routes(srv, rc))
+
+	st, admin := engine.Make(cfg.Setup.DefaultAdmin)
+	log.Printf("[run] state created with default admin of %q\n", admin)
+	if st == nil {
+		return fmt.Errorf("uh oh no state")
+	}
+	var os engine.Orders
+	os = append(os, (&engine.Order{CreateAdmin: &engine.CreateAdmin{ID: "mdhender"}}).Stamp(admin))
+
+	os.Prioritize()
+	if st, errs := st.ProcessOrders(os, true); len(errs) != 0 {
+		fmt.Printf("errors -----------------------------------------------------\n")
+		for _, err := range errs {
+			fmt.Printf("%+v\n", err)
+		}
+		return fmt.Errorf("found %d errors", len(errs))
+	} else if st != nil {
+		fmt.Println(st)
+		return nil
+	}
+
+	if st, err := engine.NewState(); err != nil {
+		return err
+	} else if st != nil {
+		fmt.Printf("------------------------------------------------------------\n")
+		fmt.Printf("%s\n", st.String())
+
+		var errs []error
+		if st, errs = st.ProcessOrders(os, true); errs != nil {
+			fmt.Printf("errors -----------------------------------------------------\n")
+			for _, err := range errs {
+				fmt.Printf("%+v\n", err)
+			}
+		}
+
+		fmt.Printf("------------------------------------------------------------\n")
+		fmt.Printf("%s\n", st.String())
+
+		return nil
+	}
 
 	log.Printf("[server] listening on %s\n", srv.Addr)
 	return srv.ListenAndServe()

@@ -18,15 +18,19 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mdhender/server/internal/polity"
+	"github.com/mdhender/server/internal/population"
 	"log"
 	"strings"
 )
 
 type State struct {
-	maps struct {
-		// ids is a global hot mess
-		ids map[string]interface{}
-	}
+	admins map[string]bool // id of the administrator
+
+	// ids is a global hot mess
+	ids map[string]interface{}
+
+	turn     int
 	polities []*Polity
 	colonies []*Colony
 	ships    []*Ship
@@ -34,9 +38,14 @@ type State struct {
 	orders Orders
 }
 
+func (st *State) ProcessOrders(orders Orders, debug bool) (*State, []error) {
+	st.turn++
+	return st, st.ExecuteOrders(orders, debug)
+}
+
 func (st *State) Lookup(id string) (o interface{}, ok bool) {
-	if st.maps.ids != nil {
-		o, ok = st.maps.ids[id]
+	if st.ids != nil {
+		o, ok = st.ids[id]
 	}
 	return o, ok
 }
@@ -59,9 +68,9 @@ func (st *State) LookupPlanet(id string) *Planet {
 	return nil
 }
 
-func (st *State) LookupPolity(id string) *Polity {
+func (st *State) LookupPolity(id string) *polity.Polity {
 	if o, ok := st.Lookup(id); ok {
-		if p, ok := o.(*Polity); ok {
+		if p, ok := o.(*polity.Polity); ok {
 			return p
 		}
 	}
@@ -98,17 +107,18 @@ type Star struct {
 
 type Orbit struct {
 	id       string
-	planet   *Planet
-	colonies []*Colony
+	planet   string
+	colonies []string
 	ships    []*Ship
 }
 
 type Planet struct {
 	id           string
+	Name         string
 	kind         PlanetKind
 	habitability int // range from 0 to 25
 	deposits     []*Resource
-	colonies     []*Colony
+	colonies     []string
 }
 
 type Polity struct {
@@ -116,11 +126,11 @@ type Polity struct {
 	name string
 	home struct {
 		system *System
-		world  *Planet
-		colony *Colony
+		world  string
+		colony string
 	}
 	controls struct {
-		colonies []*Colony
+		colonies []string
 		ships    []*Ship
 		polities []*Polity // there should never be more than one level in this hierarchy.
 	}
@@ -161,17 +171,18 @@ type Resource struct {
 
 type AutomationUnit struct{}
 type Colony struct {
-	id             string
-	kind           ColonyKind
-	number         string
-	originalPolity *Polity // set only if this is a Home Colony?
-	controlledBy   *Polity
-	system         *System
-	homePortTo     []*Ship
-	name           string
-	note           Text
-	population     Population
-	units          struct {
+	id                string
+	kind              ColonyKind
+	number            string
+	originalPolity    *Polity // set only if this is a Home Colony?
+	controlledBy      *Polity
+	system            *System
+	homePortTo        []*Ship
+	name              string
+	note              Text
+	population        population.Population
+	foodStockpileGoal int
+	units             struct {
 		farms []FarmUnit
 		mines []MineUnit
 	}
@@ -216,29 +227,6 @@ type MineUnit struct {
 }
 type MissileUnit struct{}
 type AntiMissileUnit struct{}
-type Population struct {
-	construction  int
-	professionals int
-	soldiers      int
-	spies         int
-	trainees      int
-	unskilled     int
-	others        int
-	total         int
-}
-
-// FoodNeeded returns the number of food units needed to fully feed
-// a given population and the amount needed to prevent starvation.
-// Exceeding the maximum has no game effect.
-func (p Population) FoodNeeded() (min, max int) {
-	if min = p.total / 16; min*16 != p.total {
-		min++
-	}
-	if max = p.total / 4; max*4 != p.total {
-		max++
-	}
-	return min, max
-}
 
 type RobotUnit struct{}
 
@@ -250,7 +238,7 @@ type Ship struct {
 	homePort     *Colony
 	name         string
 	note         Text
-	population   Population
+	population   population.Population
 	units        struct {
 		farms []FarmUnit
 	}

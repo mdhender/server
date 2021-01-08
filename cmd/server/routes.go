@@ -17,6 +17,8 @@
 package main
 
 import (
+	"fmt"
+	engine "github.com/mdhender/server"
 	"github.com/mdhender/server/internal/adding"
 	"github.com/mdhender/server/internal/http/rest"
 	"github.com/mdhender/server/internal/listing"
@@ -40,6 +42,7 @@ func routes(s *server, rc routeConfig) http.Handler {
 	router.Handle("GET", "/api/user/:id", rest.GetUser(rc.services.listing))
 	router.Handle("GET", "/api/users", rest.GetUsers(rc.services.listing))
 	router.Handle("GET", "/api/version", rest.GetVersion(rc.services.listing))
+	router.Handle("GET", "/api/frak", frak())
 
 	router.Handle("POST", "/api/engine/restart", s.restart())
 	router.Handle("POST", "/api/game/orders", rest.UpdateGameOrders(rc.services.updating))
@@ -57,5 +60,22 @@ type routeConfig struct {
 		listing   listing.Service
 		reporting reporting.Service
 		updating  updating.Service
+	}
+}
+
+func frak() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		st, err := engine.NewState()
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+			http.Error(w, fmt.Sprintf("%+v\n", err), http.StatusInternalServerError)
+		}
+		fmt.Printf("%s\n", st.String())
+		//errs := st.ProcessTurn()
+		//for _, err := range errs {
+		//	fmt.Printf("%+v\n", err)
+		//}
+		//fmt.Printf("%s\n", st.String())
+		w.WriteHeader(http.StatusOK)
 	}
 }

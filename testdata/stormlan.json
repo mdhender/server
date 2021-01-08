@@ -2,5 +2,6 @@
   "game-file-save-path": "D:\\GoLand\\server\\testdata\\",
   "mock-data": true,
   "public-root": "D:\\GoLand\\server\\webapp\\build",
-  "salt": ".pepper."
+  "salt": ".pepper.",
+  "setup-default-admin": "f1ffd349-6287-4b78-a600-dc5ea31090f7"
 }

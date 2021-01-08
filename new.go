@@ -19,20 +19,38 @@ package engine
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/mdhender/server/internal/colony"
+	"github.com/mdhender/server/internal/population"
+	"github.com/mdhender/server/internal/units"
+	"github.com/mdhender/server/pkg/utils"
 	"log"
+	"strings"
 )
 
-// notes on units...
-// 18_446_744_073_709_551_615 // maximum unsigned 64 bit integer
-//              4_294_967_295 // maximum unsigned 32 bit integer
-//                 10_000_000 // people in one population unit
-//                 40_000_000 // people fed by one food unit per turn
-//              1_000_000_000 // people fed by FARM-1 per turn
+// Make returns an initialized state with an administrator.
+func Make(admins ...string) (*State, string) {
+	st := &State{
+		ids:    make(map[string]interface{}),
+		admins: make(map[string]bool),
+	}
+	// add the default administrator id
+	id := uuid.New().String()
+	st.admins[id] = true
+	// add any admins that the caller passed in
+	for _, admin := range admins {
+		if admin = strings.TrimSpace(admin); admin != "" {
+			st.admins[admin] = true
+		}
+	}
+	// and return it all
+	return st, id
+}
 
 func NewState() (*State, error) {
 	st := &State{}
-	st.maps.ids = make(map[string]interface{})
+	st.ids = make(map[string]interface{})
 
+	var scarcity bool
 	for _, input := range []*struct {
 		name    string
 		sysname string
@@ -46,92 +64,149 @@ func NewState() (*State, error) {
 
 		system := st.MakeSystem(input.sysname, input.x, input.y, input.z)
 		log.Printf("[state] system %q\n", system.name)
+		polity.home.system = system
 
-		system.stars[0].orbits[5].planet = st.MakeHomePlanet(polity)
+		system.stars[0].orbits[5].planet = st.MakeHomePlanet(polity, scarcity)
+
+		scarcity = !scarcity
 	}
 
 	return st, nil
 }
 
-func (st *State) MakeColony(kind ColonyKind, polity *Polity) *Colony {
-	colony := &Colony{id: uuid.New().String(), kind: kind, controlledBy: polity}
-	st.maps.ids[colony.id] = colony
-	colony.number = colony.controlledBy.nextColonyNumber()
-	polity.controls.colonies = append(polity.controls.colonies)
-	return colony
-}
-
-func (st *State) MakeHomePlanet(polity *Polity, scarcity bool) *Planet {
-	planet := &Planet{id: uuid.New().String()}
-	st.maps.ids[planet.id] = planet
+func (st *State) MakeHomePlanet(polity *Polity, scarcity bool) string {
+	planet := Planet{id: uuid.New().String()}
 	planet.kind = TERRESTRIAL
 	planet.habitability = 25 // in tens of millions
 
-	homeColony := st.MakeColony(OPEN, polity)
-	homeColony.originalPolity = polity
-	homeColony.population.construction = 20_000
-	homeColony.population.professionals = 2_000_000
-	homeColony.population.soldiers = 2_500_000
-	homeColony.population.unskilled = 6_000_000
-	homeColony.population.others = 5_900_000
-	homeColony.population.total = homeColony.population.construction + homeColony.population.professionals + homeColony.population.soldiers + homeColony.population.spies + homeColony.population.trainees + homeColony.population.unskilled + homeColony.population.others
-	homeColony.storage.fuel = 2_000_000
-	homeColony.storage.gold = 50_000
-	homeColony.storage.metal = 4_000_000
-	homeColony.storage.nonmetal = 4_000_000
-	min, max := homeColony.population.FoodNeeded()
-	if scarcity {// put the minimum amount of food needed into storage
-		homeColony.storage.food = min
-	} else {
-		homeColony.storage.food = max
+	pop := population.NewHomeColony(false)
+	homeColony := colony.New(colony.OPEN, polity.id, polity.nextColonyNumber(), pop)
+	polity.controls.colonies = append(polity.controls.colonies, homeColony.ID())
+	planet.colonies = append(planet.colonies, homeColony.ID())
+
+	if scarcity {
+		homeColony.Ration = 0.25
 	}
+	upop := units.Unit{Kind: units.POPULATION, TechLevel: 1, Quantity: pop.TotalCount()}
+	homeColony.Units = append(homeColony.Units, upop)
+
+	// determine storage needed for the initial population
+	volume := upop.Volume()
+
+	// add initial resources and associated storage
+	for _, r := range []struct {
+		kind units.Kind
+		qty  int
+	}{
+		{units.FUEL, 2_000_000},
+		{units.GOLD, 50_000},
+		{units.METAL, 4_000_000},
+		{units.NONMETAL, 4_000_000},
+	} {
+		u := units.Unit{Kind: r.kind, Quantity: r.qty}
+		homeColony.Units = append(homeColony.Units, u)
+		volume += u.Volume()
+		fmt.Printf("[todo] homeColony.stockpile            = %s\n", u.Sexpr())
+	}
+
+	// the population on all colonies want to stockpile a certain amount of food
+	foodMin, foodMax := pop.FoodNeededPerTurn()
+	homeColony.Stockpiles.Food.Want = foodMax * 4
+	if scarcity { // put the minimum amount of food needed into storage
+		homeColony.Stockpiles.Food.Have = foodMin
+	} else {
+		homeColony.Stockpiles.Food.Have = foodMax
+	}
+	// create storage for the stockpiles
+	foodUnits := units.Unit{Kind: units.FOOD, TechLevel: 1, Quantity: homeColony.Stockpiles.Food.Have}
+	homeColony.Units = append(homeColony.Units, foodUnits)
+
+	// update volume of storage needed
+	volume += foodUnits.Volume()
+
+	// determine number of farm units needed to produce that amount of food each turn
+	fmt.Printf("[todo] homeColony.population           = %13s\n", utils.Commas(pop.TotalCount()))
+	fmt.Printf("[todo] homeColony.food.neededPerTurn   = %13s\n", utils.Commas(foodMax))
+	farmUnits := units.Unit{Kind: units.FARM, Assembled: true, TechLevel: 1, Quantity: 1}
+	fmt.Printf("[todo] homeColony.food.producedPerTurn = %13s\n", utils.Commas(farmUnits.Produce().Quantity))
+	farmUnits.Quantity = (foodMax / farmUnits.Produce().Quantity) + 1
+	fmt.Printf("[todo] homeColony.farmUnits.Quantity   = %13s\n", utils.Commas(farmUnits.Quantity))
+	fmt.Printf("[todo] homeColony.farmUnits.Produce    = %13s\n", utils.Commas(farmUnits.Produce().Quantity))
+	homeColony.Units = append(homeColony.Units, farmUnits)
 
 	for _, kind := range []ResourceKind{FUEL, GOLD, METAL, NONMETAL} {
-		mine := MineUnit{techLevel: 1, quantity: 1, resource: st.MakeResource(kind, true)}
-		planet.deposits = append(planet.deposits, mine.resource)
-		homeColony.units.mines = append(homeColony.units.mines, mine)
+		resource := st.MakeResource(kind, true)
+		planet.deposits = append(planet.deposits, resource)
+		mine := units.Unit{Kind: units.MINE, TechLevel: 1, Quantity: 100_000}
+		homeColony.Units = append(homeColony.Units, mine)
 	}
 
-	// every home world gets an orbiting colony
-	orbitingColony := st.MakeColony(ORBITING, polity)
-	orbitingColony.population.construction = 10_000
-	orbitingColony.population.professionals = 100_000
-	orbitingColony.population.soldiers = 150_000
-	orbitingColony.population.unskilled = 370_000
-	orbitingColony.population.others = 350_000
-	orbitingColony.population.total = orbitingColony.population.construction + orbitingColony.population.professionals + orbitingColony.population.soldiers + orbitingColony.population.spies + orbitingColony.population.trainees + orbitingColony.population.unskilled + orbitingColony.population.others
-	orbitingColony.storage.fuel = 200_000
-	orbitingColony.storage.gold = 5_000
-	orbitingColony.storage.metal = 400_000
-	orbitingColony.storage.nonmetal = 400_000
-	min, max = orbitingColony.population.FoodNeeded()
-	if scarcity {// put the minimum amount of food needed into storage
-		orbitingColony.storage.food = min
-	} else {
-		orbitingColony.storage.food = max
-	}
+	// add hydro-electric power plants
+	powerUnits := units.Unit{Kind: units.POWER, Assembled: true, TechLevel: 1, Quantity: 100_000}
+	homeColony.Units = append(homeColony.Units, powerUnits)
 
-	// need enough farms to produce enough food to sustain the population on the planet and in orbit.
-	// scarcity impacts the total number of farms because it is based on the amount allocated to storage.
-	// FARM-1 produces 25 Food Units per turn; provide a bit of room for growth
-	farmUnitsNeeded := ((homeColony.storage.food+orbitingColony.storage.food) / 25) + 1
-	homeColony.units.farms = append(homeColony.units.farms, FarmUnit{techLevel: 1, quantity: farmUnitsNeeded})
+	// bump the volume by by 25% to give the colony some room to expand,
+	// then add structural units needed to enclose that volume to the colony.
+	structuralUnitsNeeded := int(float64(volume)*1.25) * homeColony.StructureFactor()
+	homeColony.Units = append(homeColony.Units, units.Unit{Kind: units.STRUCTURAL, Assembled: true, TechLevel: 1, Quantity: structuralUnitsNeeded})
 
-	polity.home.world = planet
-	polity.home.colony = homeColony
-	return planet
+	st.ids[planet.id] = planet
+	st.ids[homeColony.ID()] = homeColony
+
+	//// every home world gets an orbiting colony
+	//pop = population.NewHomeColony(true)
+	//orbitingColony := colony.New(colony.OPEN, polity.nextColonyNumber(), pop)
+	//st.ids[orbitingColony.ID()] = orbitingColony
+	//polity.controls.colonies = append(polity.controls.colonies, orbitingColony.ID())
+	//if scarcity {
+	//	orbitingColony.Ration = 0.25
+	//}
+	//
+	//fmt.Printf("[todo] orbitingColony.storage.fuel = 200_000")
+	//fmt.Printf("[todo] orbitingColony.storage.gold = 5_000")
+	//fmt.Printf("[todo] orbitingColony.storage.metal = 400_000")
+	//fmt.Printf("[todo] orbitingColony.storage.nonmetal = 400_000")
+	//
+	//// the population on all colonies want to stockpile a certain amount of food and goods
+	//min, max = pop.FoodNeededPerTurn()
+	//orbitingColony.Stockpiles.Food.Want = max
+	//if scarcity { // put the minimum amount of food needed into storage
+	//	orbitingColony.Stockpiles.Food.Have = max
+	//} else {
+	//	orbitingColony.Stockpiles.Food.Have = min
+	//}
+	//// create storage for the stockpiles
+	//foodUnits = units.Unit{Kind: units.FOOD, Quantity: homeColony.Stockpiles.Food.Want}
+	//storageUnits = units.Unit{Kind: units.STRUCTURAL, Quantity: foodUnits.Volume()}
+	//
+	//// need enough farms to produce enough food to sustain the population on the planet and in orbit.
+	//// scarcity impacts the total number of farms because it is based on the amount allocated to storage.
+	//// FARM-1 produces 25 Food Units per turn; provide a bit of room for growth
+	//farmUnitsNeeded := ((orbitingColony.storage.food + orbitingColony.storage.food) / 25) + 1
+	//orbitingColony.units.farms = append(orbitingColony.units.farms, FarmUnit{techLevel: 1, quantity: farmUnitsNeeded})
+	//
+	//// bump the number of storage units to give the colony some room to expand
+	//storageUnits.Quantity = int(float64(storageUnits.Quantity) * 1.25)
+	//// then add them to the colony.
+	//orbitingColony.Units = append(orbitingColony.Units, storageUnits)
+
+	polity.home.world = planet.id
+	polity.home.colony = homeColony.ID()
+
+	return planet.id
 }
 
 func (st *State) MakePolity(name string) *Polity {
 	p := &Polity{id: uuid.New().String()}
-	st.maps.ids[p.id] = p
+	st.ids[p.id] = p
+	st.polities = append(st.polities, p)
 	p.name = name
 	return p
 }
 
 func (st *State) MakeResource(kind ResourceKind, unlimited bool) *Resource {
 	resource := &Resource{id: uuid.New().String()}
-	st.maps.ids[resource.id] = resource
+	st.ids[resource.id] = resource
 	resource.kind = kind
 	resource.unlimited = unlimited
 	if resource.unlimited {
@@ -150,7 +225,7 @@ func (st *State) MakeResource(kind ResourceKind, unlimited bool) *Resource {
 
 func (st *State) MakeSystem(name string, x, y, z int) *System {
 	s := &System{id: uuid.New().String()}
-	st.maps.ids[s.id] = s
+	st.ids[s.id] = s
 	s.coords.x, s.coords.y, s.coords.z = x, y, z
 	s.name = fmt.Sprintf("%02d-%02d-%02d", x, y, z)
 	star := st.MakeStar(s.name)
@@ -160,14 +235,14 @@ func (st *State) MakeSystem(name string, x, y, z int) *System {
 
 func (st State) MakeStar(name string) *Star {
 	star := &Star{id: uuid.New().String()}
-	st.maps.ids[star.id] = star
+	st.ids[star.id] = star
 	star.name = name
-	for orbit := 0; orbit < 11; orbit++ {
+	for orbit := 0; orbit < len(star.orbits); orbit++ {
 		star.orbits[orbit] = &Orbit{}
 	}
 	return star
 }
 
-func (star *Star) AddHomeWorld(planet *Planet) {
-	star.orbits[5].planet = planet
+func (star *Star) AddHomeWorld(id string) {
+	star.orbits[5].planet = id
 }

@@ -18,12 +18,22 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mdhender/server/internal/colony"
+	"github.com/mdhender/server/internal/units"
+	"github.com/mdhender/server/pkg/utils"
 	"log"
+	"sort"
 )
 
-func (st *State) ExecuteOrders(debug bool) []error {
+func (st *State) ExecuteOrders(orders Orders, debug bool) []error {
+	orders.Prioritize()
+	sort.Stable(orders)
+
 	var errs []error
 	for _, err := range st.gameDataCleanupStage(debug) {
+		errs = append(errs, err)
+	}
+	for _, err := range st.adminStage(orders, debug) {
 		errs = append(errs, err)
 	}
 	for _, err := range st.combatOrdersStage(debug) {
@@ -76,6 +86,33 @@ func (st *State) ExecuteOrders(debug bool) []error {
 	}
 	for _, err := range st.sendOutputStage(debug) {
 		errs = append(errs, err)
+	}
+	for _, err := range st.resetStage(debug) {
+		errs = append(errs, err)
+	}
+	return errs
+}
+
+// Admin Stage
+func (st *State) adminStage(orders Orders, debug bool) []error {
+	stageName := "admin"
+	var errs []error
+	for i, order := range orders {
+		switch {
+		case order.Debug != nil:
+			debug = order.Debug.On
+			if debug {
+				log.Printf("[stage:%s] %4d debug %v\n", stageName, i, *order.Debug)
+			}
+		case order.CreateAdmin != nil:
+			if debug {
+				log.Printf("[stage:%s] %4d createAdmin %q %q\n", stageName, i, order.issuedBy, order.CreateAdmin.ID)
+			}
+			_, errs := st.CreateAdmin(order.issuedBy, order.CreateAdmin.ID)
+			for _, err := range errs {
+				errs = append(errs, err)
+			}
+		}
 	}
 	return errs
 }
@@ -145,23 +182,37 @@ func (st *State) buildChangeStage(debug bool) []error {
 func (st *State) colonyProductionStage(debug bool) []error {
 	stageName := "colonyProduction"
 	var errs []error
-	for _, colony := range st.colonies {
-		log.Printf("[stage:%s] colony %q\n", stageName, colony.name)
+	for id, o := range st.ids {
+		c, ok := o.(colony.Colony)
+		if !ok {
+			continue
+		}
+		fmt.Printf("[stage:%s] colony %s %q\n", stageName, id, c.Name)
 
-		// farm production
-		var unitsProduced, unitsStored int
-		for _, farm := range colony.units.farms {
-			unitsProduced += farm.Produce()
+		// production
+		var food []units.Unit
+		for _, unit := range c.Units {
+			switch unit.Kind {
+			case units.FARM:
+				u := unit.Produce()
+				fmt.Printf("  > %s\n", u.Sexpr())
+				food = append(food, u)
+			case units.POWER:
+				u := unit.Produce()
+				fmt.Printf("  > %s\n", u.Sexpr())
+				c.Batteries += u.Quantity
+			}
 		}
 
 		// calculate food needed
-		minNeeded, maxNeeded := colony.population.FoodNeeded()
-		unitsRationed := int(float64(maxNeeded) * colony.ration)
+		minNeeded, maxNeeded := c.Population.FoodNeededPerTurn()
+		unitsRationed := int(float64(maxNeeded) * c.Ration)
 		if unitsRationed < minNeeded {
 			// potential for starvation
 		}
 
 		// consume from production before taking from storage
+		var unitsProduced, unitsStored int
 		if unitsProduced >= unitsRationed {
 			unitsProduced, unitsRationed = unitsProduced-unitsRationed, 0
 		} else {
@@ -350,6 +401,26 @@ func (st *State) gameDataCleanupStage(debug bool) []error {
 				log.Printf("[stage:%s] %4d debug %v\n", stageName, i, *order.Debug)
 			}
 		}
+	}
+	// reset colonies
+	for id, o := range st.ids {
+		c, ok := o.(colony.Colony)
+		if !ok {
+			continue
+		}
+		fmt.Printf("[stage:%s] colony %s %q\n", stageName, id, c.Name)
+		if c.Batteries != 0 {
+
+		}
+		c.Batteries = 0
+	}
+	// reset ships
+	for id, o := range st.ids {
+		s, ok := o.(Ship)
+		if !ok {
+			continue
+		}
+		fmt.Printf("[stage:%s] ship %s %q\n", stageName, id, s.name)
 	}
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
@@ -581,6 +652,33 @@ func (st *State) rationStage(debug bool) []error {
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
 }
 
+// reset stage
+func (st *State) resetStage(debug bool) []error {
+	stageName := "resetCleanup"
+	var errs []error
+	// reset colonies
+	for id, o := range st.ids {
+		c, ok := o.(colony.Colony)
+		if !ok {
+			continue
+		}
+		fmt.Printf("[stage:%s] colony %s %q\n", stageName, id, c.Name)
+		if c.Batteries != 0 {
+			fmt.Printf("  > (reset (batteries %s))\n", utils.Commas(c.Batteries))
+		}
+		c.Batteries = 0
+	}
+	// reset ships
+	for id, o := range st.ids {
+		s, ok := o.(Ship)
+		if !ok {
+			continue
+		}
+		fmt.Printf("[stage:%s] ship %s %q\n", stageName, id, s.name)
+	}
+	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
 func (st *State) scrapStage(debug bool) []error {
 	stageName := "scrap"
 	var errs []error
@@ -673,7 +771,7 @@ func (st *State) shipProductionStage(debug bool) []error {
 		}
 
 		// calculate food needed
-		minNeeded, maxNeeded := ship.population.FoodNeeded()
+		minNeeded, maxNeeded := ship.population.FoodNeededPerTurn()
 		unitsRationed := int(float64(maxNeeded) * ship.ration)
 		if unitsRationed != minNeeded {
 			// potential for starvation
@@ -700,6 +798,10 @@ func (st *State) shipProductionStage(debug bool) []error {
 		// population changes
 	}
 	return append(errs, fmt.Errorf("%s: %w", stageName, ERRNOTIMPLEMENTED))
+}
+
+func farmProductionStep() {
+
 }
 
 // Ship Travel Stage

@@ -43,3 +43,15 @@ const (
 	METAL
 	NONMETAL
 )
+
+func (e ColonyKind) String() string {
+	switch e {
+	case OPEN:
+		return "open"
+	case ENCLOSED:
+		return "enclosed"
+	case ORBITING:
+		return "orbiting"
+	}
+	panic("!")
+}

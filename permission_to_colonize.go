@@ -18,6 +18,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mdhender/server/internal/colony"
 	"log"
 )
 
@@ -55,17 +56,22 @@ func (st *State) PermissionToColonize(orderedByID, planetID, shipID string) erro
 
 	// the polity issuing the order must control at least one colony on the planet
 	hasColony := false
-	for _, colony := range planet.colonies {
-		if colony.controlledBy == ship.controlledBy {
-			// ship doesn't need permission because its polity has
-			// already established a colony on the planet!
-			return nil
-		}
+	for _, id := range planet.colonies {
+		if o, ok := st.ids[id]; ok {
+			if c, ok := o.(colony.Colony); ok {
+				if c.OwnedBy == ship.controlledBy.id {
+					// ship doesn't need permission because its polity has
+					// already established a colony on the planet!
+					return nil
+				}
 
-		if colony.controlledBy == orderedBy {
-			hasColony = true
+				if c.OwnedBy == orderedByID {
+					hasColony = true
+				}
+			}
 		}
 	}
+
 	if !hasColony {
 		return fmt.Errorf("planet refused orders: %w", ERRFORBIDDEN)
 	}

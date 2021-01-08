@@ -49,6 +49,9 @@ type config struct {
 	}
 	MockData   bool
 	SampleData *sampleData
+	Setup      struct {
+		DefaultAdmin string
+	}
 }
 
 type sampleData struct {
@@ -87,6 +90,7 @@ func getConfig() (*config, error) {
 	cfg.Server.Timeout.Idle = 10 * time.Second
 	cfg.Server.Timeout.Read = 5 * time.Second
 	cfg.Server.Timeout.Write = 10 * time.Second
+	cfg.Setup.DefaultAdmin = "f1ffd349-6287-4b78-a600-dc5ea31090f7"
 
 	var (
 		fs                 = flag.NewFlagSet("server", flag.ExitOnError)
@@ -104,6 +108,7 @@ func getConfig() (*config, error) {
 		serverTimeoutIdle  = fs.Duration("idle-timeout", cfg.Server.Timeout.Idle, "http idle timeout")
 		serverTimeoutRead  = fs.Duration("read-timeout", cfg.Server.Timeout.Read, "http read timeout")
 		serverTimeoutWrite = fs.Duration("write-timeout", cfg.Server.Timeout.Write, "http write timeout")
+		setupDefaultAdmin  = fs.String("setup-default-admin", cfg.Setup.DefaultAdmin, "admin id to assign to all games")
 	)
 
 	if err := ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SERVER"), ff.WithConfigFileFlag("config"), ff.WithConfigFileParser(ff.JSONParser)); err != nil {
@@ -124,7 +129,10 @@ func getConfig() (*config, error) {
 	cfg.Server.Timeout.Idle = *serverTimeoutIdle
 	cfg.Server.Timeout.Read = *serverTimeoutRead
 	cfg.Server.Timeout.Write = *serverTimeoutWrite
+	cfg.Setup.DefaultAdmin = *setupDefaultAdmin
 
 	log.Printf("[config] %-30s == %q\n", "game-file-save-path", cfg.Games.FileSavePath)
+	log.Printf("[config] %-30s == %q\n", "setup-default-admin", cfg.Setup.DefaultAdmin)
+
 	return &cfg, nil
 }

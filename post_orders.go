@@ -53,7 +53,7 @@ func (st *State) PostOrders(orderedByID string, orders Orders) error {
 			}
 		case order.Accept != nil:
 			if debug {
-				log.Printf("[orders] %4d accept %v\n", *order.Accept)
+				log.Printf("[orders] %4d accept %v\n", i, *order.Accept)
 			}
 			if err := st.Accept(orderedByID, order.Accept.AssetID); err != nil {
 				errs = append(errs, err)

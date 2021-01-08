@@ -18,6 +18,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mdhender/server/internal/polity"
 	"log"
 )
 
@@ -32,37 +33,40 @@ type Accept struct {
 // 2. Asset must be controlled by a viceroy of the polity issuing the order.
 //
 // Assumption is that all of the assets of the viceroy were originally controlled by the polity issuing the order.
-func (st *State) Accept(orderedByID, assetID string) error {
-	orderedBy := st.LookupPolity(orderedByID)
-	if orderedBy == nil {
-		log.Printf("[bug] State.Accept: orderedByID is invalid\n")
+func (st *State) Accept(issuedByID, assetID string) error {
+	if issuedBy := st.LookupPolity(issuedByID); issuedBy == nil {
+		log.Printf("[bug] State.Accept: issuedByID is invalid\n")
 		return ERRBUG
 	}
 
 	// asset must be a colony or ship
 	var asset struct {
-		controlledBy *Polity
+		controlledBy string
+		polity *polity.Polity
 		colony       *Colony
 		ship         *Ship
 	}
 	if colony := st.LookupColony(assetID); colony != nil {
-		asset.controlledBy = colony.controlledBy
+		asset.controlledBy = colony.controlledBy.id
 		asset.colony = colony
 	} else if ship := st.LookupShip(assetID); ship != nil {
-		asset.controlledBy = ship.controlledBy
+		asset.controlledBy = ship.controlledBy.id
 		asset.ship = ship
 	} else {
 		return fmt.Errorf("invalid actor %q: %w", assetID, ERRBADREQUEST)
 	}
 
 	// asset must be controlled by a viceroy of the order issuer's polity
-	if !asset.controlledBy.isViceroyOf(orderedBy) {
+	if asset.polity = st.LookupPolity(asset.controlledBy); asset.polity == nil {
+		log.Printf("[bug] State.Accept: controlledBy is invalid\n")
+		return ERRBUG
+	} else if !asset.polity.Serves(issuedByID) {
 		return fmt.Errorf("asset refuses order: %w", ERRFORBIDDEN)
 	}
 
 	// all checks have passed, so transfer the colony or ship
 	if asset.colony != nil {
-		return st.transferColony(asset.colony, asset.controlledBy, orderedBy)
+		return st.transferColony(asset.colony, asset.polity, issuedByID)
 	}
-	return st.transferShip(asset.ship, asset.controlledBy, orderedBy)
+	return st.transferShip(asset.ship, asset.polity, issuedByID)
 }

@@ -1,0 +1,36 @@
+= Gas Giant Battles
+Michael D Henderson <mdhender@mdhender.com>
+v0.1, 2021-01-02
+:doctype: book
+:sectnums:
+:sectnumlevels: 5
+:partnums:
+:toc: right
+
+:sectnums!:
+== Introduction
+
+== Stuff
+
+=== Food
+One unit of FOOD is enough to feed a single member of the POPULATION for one TURN (one calendar quarter).
+
+Persons that are forced to consume less are at risk of STARVATION. They also have an increased risk of becoming MALCONTENTS.
+
+Persons on a COLONY will try to stockpile food if at all possible.
+
+== Glossary
+
+Colony::TODO
+
+Food::One unit of FOOD will feed one PERSON for one QUARTER (one game turn).
+
+Person::An individual member of the POPULATION.
+
+Population::TODO
+
+Quarter::The length of a TURN in the game. There are four quarters in a game year.
+
+Starvation::x
+
+Stockpile::Persons on a colony will create a stockpile of one year's (four quarters) food supplies.
