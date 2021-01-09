@@ -1,20 +1,18 @@
-/*
- * server - a game engine
- * Copyright (C) 2021  Michael D Henderson
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+// server - a game engine
+// Copyright (C) 2020  Michael D Henderson
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package engine
 
@@ -47,191 +45,10 @@ func (o Orders) SortStable() {
 	})
 }
 
-func (o Orders) Prioritize() {
-	// loop through all of the orders and assign the sort priority
-	// based on the order type. yeah, i think that this is gross.
-	for _, order := range o {
-		switch {
-		case order.Debug != nil:
-			order.priority = 0
-
-		// admin orders
-		case order.CreateAdmin != nil:
-			order.priority = 1
-		case order.CreateSystem != nil:
-			order.priority = 2
-		case order.CreatePolity != nil:
-			order.priority = 3
-
-		// Combat Orders Stage - Prefire Segment
-		case order.Dodge != nil:
-			order.priority = 10001
-		case order.Accept != nil:
-			order.priority = 10002
-		case order.AutoReturnFire != nil:
-			order.priority = 10003
-		case order.CloseProximityTargeting != nil:
-			order.priority = 10004
-		// Combat Orders Stage - Pre-Maneuver Fire Segment
-		case order.PreManeuverEnergyWeaponFire != nil:
-			order.priority = 10101
-		case order.PreManeuverMissileFire != nil:
-			order.priority = 10102
-		// Combat Orders Stage - Allocate Damage
-		// Combat Orders Stage - Maneuver Segment
-		case order.Undock != nil:
-			order.priority = 10301
-		case order.Run != nil:
-			order.priority = 10302
-		case order.TacticalManeuver != nil:
-			order.priority = 10303
-		case order.Close != nil:
-			order.priority = 10304
-		case order.Dock != nil:
-			order.priority = 10305
-		// Combat Orders Stage - Allocate Damage
-		// Combat Orders Stage - Post-Maneuver Fire Segment
-		case order.AfterManeuverEnergyWeaponFire != nil:
-			order.priority = 10501
-		case order.AfterManeuverMissileFire != nil:
-			order.priority = 10501
-		// Combat Orders Stage - Allocate Damage
-		// Combat Orders Stage - Ground Combat Segment
-		case order.Withdraw != nil:
-			order.priority = 10701
-		case order.DefensiveSupport != nil:
-			order.priority = 10702
-		case order.Invade != nil:
-			order.priority = 10703
-		case order.OffensiveSupport != nil:
-			order.priority = 10704
-		// Combat Orders Stage - Cycle Ground Combat
-		// Permissions Orders Stage
-		case order.PermissionToColonize != nil:
-			order.priority = 11001
-		case order.HomePortChange != nil:
-			order.priority = 11002
-		// Permissions Orders Stage - Diplomacy
-		// Disassembly Stage
-		case order.Disassemble != nil:
-			order.priority = 12001
-		case order.Scrap != nil:
-			order.priority = 12002
-		case order.Junk != nil:
-			order.priority = 12003
-		case order.CombineFactoryGroup != nil:
-			order.priority = 12004
-		// Setup Stage
-		case order.DefineCargoHold != nil:
-			order.priority = 13001
-		case order.SetUp != nil:
-			order.priority = 13002
-		case order.AddOn != nil:
-			order.priority = 13003
-		// Transfer Stage
-		case order.UnloadCargo != nil:
-			order.priority = 14001
-		case order.Transfer != nil:
-			order.priority = 14002
-		case order.PickUpItem != nil:
-			order.priority = 14003
-		case order.PickUpPopulation != nil:
-			order.priority = 14003
-		case order.LoadCargo != nil:
-			order.priority = 14005
-		// Draft Orders Stage
-		case order.Draft != nil:
-			order.priority = 15001
-		case order.Disband != nil:
-			order.priority = 15002
-		// Assembly Stage - Order Processing Segment
-		case order.AssembleFactory != nil:
-			order.priority = 16101
-		case order.AssembleFactoryGroup != nil:
-			order.priority = 16101
-		case order.AssembleItem != nil:
-			order.priority = 16101
-		case order.AssembleMine != nil:
-			order.priority = 16101
-		case order.AssembleMineGroup != nil:
-			order.priority = 16101
-		case order.ExpendResearchPointsOnly != nil:
-			order.priority = 16110
-		case order.ExpendPrototype != nil:
-			order.priority = 16111
-		case order.FactoryGroupChange != nil:
-			order.priority = 16112
-		case order.BuildChange != nil:
-			order.priority = 16113
-		case order.MineChange != nil:
-			order.priority = 16114
-		case order.ShutDown != nil:
-			order.priority = 16115
-		case order.StartUp != nil:
-			order.priority = 16116
-		// Assembly Stage - Non Prototype TL Increases Segment
-		case order.ExpendCommittedBufferResearchPoints != nil:
-			order.priority = 16201
-		// Build Change Stage (merged with Assembly Stage)
-		// Surveys and Probes Stage
-		case order.Probe != nil:
-			order.priority = 17001
-		case order.Survey != nil:
-			order.priority = 17002
-		case order.LaunchRobotProbe != nil:
-			order.priority = 17003
-		// Pay Change Stage
-		case order.Pay != nil:
-			order.priority = 18001
-		case order.Ration != nil:
-			order.priority = 18002
-		// Naming Orders Stage
-		case order.Name != nil:
-			order.priority = 19001
-		case order.Note != nil:
-			order.priority = 19002
-		case order.ControlPlanet != nil:
-			order.priority = 19003
-		case order.UncontrolPlanet != nil:
-			order.priority = 19004
-		case order.Message != nil:
-			order.priority = 19005
-		// Ship Travel Stage
-		case order.Jump != nil:
-			order.priority = 20001
-		case order.Move != nil:
-			order.priority = 20002
-		// Probe Stage
-		case order.ProbeOrbit != nil:
-			order.priority = 21001
-		case order.ProbeSystem != nil:
-			order.priority = 21002
-		// Give Stage
-		case order.Give != nil:
-			order.priority = 22001
-		// Production Stage
-		// Produce Out Put Stage
-		// Send Out Put Stage
-
-		// Unknown Stage Priority
-		case order.Merge != nil:
-			order.priority = 99999
-		case order.MineShutDown != nil:
-			order.priority = 99999
-		case order.MineStartUp != nil:
-			order.priority = 99999
-
-		default:
-			panic("assert(order.Type != unknown)")
-		}
-	}
-}
-
 // Order is a hot mess, but it allows our JSON input to be simpler to read and parse.
 // The consumer of an Order must test all the properties for non-nil to determine which one to process.
 type Order struct {
 	priority                            int                                  // priority for sorting orders
-	issuedBy                            string                               // polity that issued the order
 	Accept                              *Accept                              `json:"accept,omitempty"`
 	AddOn                               *AddOn                               `json:"add_on,omitempty"`
 	AfterManeuverEnergyWeaponFire       *AfterManeuverEnergyWeaponFire       `json:"after_maneuver_energy_weapon_fire,omitempty"`
@@ -247,9 +64,6 @@ type Order struct {
 	CloseProximityTargeting             *CloseProximityTargeting             `json:"close_proximity_targeting,omitempty"`
 	CombineFactoryGroup                 *CombineFactoryGroup                 `json:"combine_factory_group,omitempty"`
 	ControlPlanet                       *ControlPlanet                       `json:"control_planet,omitempty"`
-	CreateAdmin                         *CreateAdmin                         `json:"create_admin,omitempty"`
-	CreatePolity                        *CreatePolity                        `json:"create_polity,omitempty"`
-	CreateSystem                        *CreateSystem                        `json:"create_system,omitempty"`
 	Debug                               *Debug                               `json:"debug,omitempty"`
 	DefensiveSupport                    *DefensiveSupport                    `json:"defensive_support,omitempty"`
 	DefineCargoHold                     *DefineCargoHold                     `json:"define_cargo_hold,omitempty"`
@@ -302,9 +116,10 @@ type Order struct {
 	Withdraw                            *Withdraw                            `json:"withdraw,omitempty"`
 }
 
-func (o *Order) Stamp(issuedBy string) *Order {
-	o.issuedBy = issuedBy
-	return o
+// Accept order...
+type Accept struct {
+	PlayerID string `json:"player_id"`
+	TargetID string `json:"target_id"`
 }
 
 // AddOn Order...
@@ -390,7 +205,7 @@ type BuildChange struct {
 type Close struct {
 	ShipID           string `json:"ship_id"`                     // id of ship being ordered
 	TargetID         string `json:"target_id"`                   // id of ship or colony to close upon
-	StandoffDistance int    `json:"standoff_distance,omitempty"` // optional distance to stand off from target
+	StandoffDistance int    `json:"standoff_distance,omitempty"` // optional distinance to stand off from target
 }
 
 // CloseProximityTargeting order...
@@ -509,6 +324,19 @@ type FactoryGroupChange struct {
 	Quantity int    `json:"quantity"`  // number of factory units to move
 }
 
+// Give order...
+type Give struct {
+	SourceID string `json:"source_id"` // id of ship or colony being ordered
+	Type     string `json:"type"`      // must be one of ALLY, RULER, VICEROY
+	TargetID string `json:"target_id"` // id of the entity being given to
+}
+
+// HomePortChange order...
+type HomePortChange struct {
+	ShipID   string `json:"ship_id"`   // id of ship being ordered
+	ColonyID string `json:"colony_id"` // id of colony being targeted
+}
+
 // Invade order...
 type Invade struct {
 	SourceID string `json:"source_id"` // id of ship or colony being ordered
@@ -525,6 +353,12 @@ type Jump struct {
 	ShipID string `json:"ship_id"` // id of ship being ordered
 	Coords Coords `json:"coords"`  // coordinates of destination
 	Offset int    `json:"offset"`  // distance (in tactical distance units) to arrive from destination
+}
+
+// Junk order...
+type Junk struct {
+	SourceID string `json:"source_id"` // id of ship or colony being ordered
+	TargetID string `json:"target_id"` // id of ship or colony being targeted
 }
 
 // LaunchRobotProbe order...
@@ -590,6 +424,22 @@ type Move struct {
 	Offset int    `json:"offset"`  // distance (in tactical distance units) to arrive from destination
 }
 
+// Name order...
+// Note: original order used "Entity" instead of "Type".
+// Entity must be one of SHIP, COLONY, SYSTEM, STAR, PLANET, or PLAYER
+type Name struct {
+	EntityID string `json:"entity_id"` // id of entity being ordered
+	Type     string `json:"type"`      // type of entity to assign name to
+	Name     string `json:"name"`      // name to assign to the entity
+}
+
+// Note order...
+// Text must be UTF-8 and is truncated at 200 runes.
+type Note struct {
+	SourceID string `json:"source_id"` // id of ship or colony being ordered
+	Text     string `json:"text"`      // text to be displayed on Owner's report for the ship or colony
+}
+
 // OffensiveSupport order...
 type OffensiveSupport struct {
 	SourceID string `json:"source_id"` // id of ship or colony being ordered
@@ -607,6 +457,12 @@ type Pay struct {
 	ColonyID       string  `json:"colony_id"`       // id of colony being ordered
 	Amount         float64 `json:"amount"`          // amount (in Consumer Goods) to pay per unit
 	PopulationType string  `json:"population_type"` // type of population to pay
+}
+
+// PermissionToColonize order...
+type PermissionToColonize struct {
+	ColonyID string `json:"colony_id"` // id of colony being ordered
+	ShipID   string `json:"ship_id"`   // id of ship being granted permission
 }
 
 // PickUpItem order...
@@ -679,6 +535,14 @@ type Ration struct {
 type Run struct {
 	ShipID   string `json:"ship_id"`   // id of ship being ordered
 	TargetID string `json:"target_id"` // id of S/C to run from
+}
+
+// Scrap order...
+type Scrap struct {
+	SourceID  string `json:"source_id"` // id of ship or colony being ordered
+	Item      string `json:"item"`
+	TechLevel int    `json:"tech_level"`
+	Quantity  int    `json:"quantity"`
 }
 
 // SetUp order...

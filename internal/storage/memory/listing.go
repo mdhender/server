@@ -18,8 +18,8 @@ package memory
 
 import (
 	"fmt"
-	"github.com/mdhender/server/internal/auth"
-	"github.com/mdhender/server/internal/listing"
+	"github.com/mdhender/server/internal/obsolete/auth"
+	"github.com/mdhender/server/internal/obsolete/listing"
 )
 
 // This file implements the listing.Repository interface

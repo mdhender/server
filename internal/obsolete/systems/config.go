@@ -14,32 +14,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package memory
+package systems
 
 import (
-	"fmt"
-	"github.com/mdhender/server/internal/obsolete/auth"
-	"github.com/mdhender/server/internal/obsolete/updating"
+	"github.com/mdhender/server/internal/obsolete/orbits"
+	"math/rand"
 )
 
-// This file implements the updating.Repository interface
-
-// UpdateGame applies changes to an existing game to the store.
-func (m *Store) UpdateGame(a *auth.Authorization, gu updating.GameUpdates) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
-	}
-
-	return fmt.Errorf("not implemented")
+type SystemConfig struct {
+	prng   *rand.Rand
+	Coords CoordConfig
+	Orbits orbits.OrbitConfig
 }
 
-// UpdateGameOrders applies a new set of orders to an existing game to the store.
-func (m *Store) UpdateGameOrders(a *auth.Authorization, o updating.Orders) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
-	}
-
-	return fmt.Errorf("not implemented")
+type CoordConfig struct {
+	prng     *rand.Rand
+	Min, Max int
 }

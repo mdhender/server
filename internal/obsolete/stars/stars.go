@@ -14,32 +14,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package memory
+package stars
 
 import (
-	"fmt"
-	"github.com/mdhender/server/internal/obsolete/auth"
-	"github.com/mdhender/server/internal/obsolete/updating"
+	"github.com/mdhender/server/internal/obsolete/orbits"
 )
 
-// This file implements the updating.Repository interface
-
-// UpdateGame applies changes to an existing game to the store.
-func (m *Store) UpdateGame(a *auth.Authorization, gu updating.GameUpdates) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
-	}
-
-	return fmt.Errorf("not implemented")
-}
-
-// UpdateGameOrders applies a new set of orders to an existing game to the store.
-func (m *Store) UpdateGameOrders(a *auth.Authorization, o updating.Orders) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
-	}
-
-	return fmt.Errorf("not implemented")
+// Star may be a member of a multiple-star system.
+// By the way, I think that orbit 11 is the default jump point target.
+type Star struct {
+	ID     string
+	Name   string
+	Orbits [11]*orbits.Orbit
 }

@@ -14,32 +14,34 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package memory
+package rest
 
 import (
 	"fmt"
+	"github.com/mdhender/server/internal/jsonapi"
 	"github.com/mdhender/server/internal/obsolete/auth"
-	"github.com/mdhender/server/internal/obsolete/updating"
+	"github.com/mdhender/server/internal/obsolete/reporting"
+	"github.com/mdhender/server/internal/way"
+	"log"
+	"net/http"
 )
 
-// This file implements the updating.Repository interface
-
-// UpdateGame applies changes to an existing game to the store.
-func (m *Store) UpdateGame(a *auth.Authorization, gu updating.GameUpdates) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
+// GetGamePlayerPrintout
+func GetGamePlayerPrintout(rs reporting.Service) http.HandlerFunc {
+	type okResult struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
 	}
 
-	return fmt.Errorf("not implemented")
-}
+	a := &auth.Authorization{ID: "usagi", Roles: make(map[string]bool)}
+	a.Roles["admin"] = true
 
-// UpdateGameOrders applies a new set of orders to an existing game to the store.
-func (m *Store) UpdateGameOrders(a *auth.Authorization, o updating.Orders) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := way.Param(r.Context(), "id")
+		playerName := way.Param(r.Context(), "player_name")
+		turnNumber := way.Param(r.Context(), "turn_number")
+		log.Printf("[reporting] not implemented %q %q %q\n", id, playerName, turnNumber)
+		jsonapi.Error(w, r, http.StatusNotImplemented, fmt.Errorf("!implmented"))
 	}
 
-	return fmt.Errorf("not implemented")
 }

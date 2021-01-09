@@ -14,32 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package memory
+package tribes
 
 import (
-	"fmt"
-	"github.com/mdhender/server/internal/obsolete/auth"
-	"github.com/mdhender/server/internal/obsolete/updating"
+	"encoding/json"
+	"github.com/mdhender/server/internal/obsolete/planets"
+	"github.com/mdhender/server/internal/obsolete/systems"
 )
 
-// This file implements the updating.Repository interface
-
-// UpdateGame applies changes to an existing game to the store.
-func (m *Store) UpdateGame(a *auth.Authorization, gu updating.GameUpdates) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
-	}
-
-	return fmt.Errorf("not implemented")
+type Tribe struct {
+	Name       string          `json:"name"`        // name of the tribe
+	HomeSystem *systems.System `json:"home_system"` // tribe's home system
+	HomeWorld  *planets.Planet `json:"home_world"`  // tribe's home world
 }
 
-// UpdateGameOrders applies a new set of orders to an existing game to the store.
-func (m *Store) UpdateGameOrders(a *auth.Authorization, o updating.Orders) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
+func (t *Tribe) MarshalJSON() ([]byte, error) {
+	data := struct {
+		Name       string `json:"name"`
+		HomeSystem string `json:"home_system"`
+		HomeWorld  string `json:"home_world"`
+	}{
+		Name:       t.Name,
+		HomeSystem: t.HomeSystem.Name,
+		HomeWorld:  t.HomeWorld.ID,
 	}
-
-	return fmt.Errorf("not implemented")
+	return json.Marshal(&data)
 }

@@ -3,5 +3,5 @@
   "mock-data": true,
   "public-root": "D:\\GoLand\\server\\webapp\\build",
   "salt": ".pepper.",
-  "setup-default-admin": "f1ffd349-6287-4b78-a600-dc5ea31090f7"
+  "setup-default-admin": "admin"
 }
