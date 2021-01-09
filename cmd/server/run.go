@@ -97,7 +97,6 @@ func run(cfg *config) error {
 		return fmt.Errorf("found %d errors", len(errs))
 	} else if st != nil {
 		fmt.Println(st)
-		return nil
 	}
 
 	log.Printf("[server] listening on %s\n", srv.Addr)
