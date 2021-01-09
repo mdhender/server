@@ -69,8 +69,7 @@ func run(cfg *config) error {
 		{"usagi", "Shikoku", 1, 1, 1},
 		{"tomoe", "Kyushu", 2, 2, 2},
 	} {
-		system := &engine.Order{CreateSystem: &engine.CreateSystem{X: input.x, Y: input.y, Z: input.z}}
-		os = append(os, system.Stamp(admin))
+		os = append(os, (&engine.Order{CreateSystem: &engine.CreateSystem{X: input.x, Y: input.y, Z: input.z}}).Stamp(admin))
 		os = append(os, (&engine.Order{CreatePolity: &engine.CreatePolity{ID: input.polity, Name: input.polity}}).Stamp(admin))
 		log.Printf("[state] polity %q\n", input.polity)
 
@@ -86,13 +85,12 @@ func run(cfg *config) error {
 	os.Prioritize()
 	if st, errs := st.ProcessOrders(os, true); len(errs) != 0 {
 		fmt.Printf("errors -----------------------------------------------------\n")
-		max := 10
+		var counter int
 		for _, err := range errs {
 			if !errors.Is(err, engine.ERRNOTIMPLEMENTED) {
 				fmt.Printf("%+v\n", err)
-			} else if max > 0 {
+			} else if counter = counter + 1; counter < 5 {
 				fmt.Printf("%+v\n", err)
-				max--
 			}
 		}
 		fmt.Printf("admins are %v\n", st.Admins())
