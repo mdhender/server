@@ -21,7 +21,6 @@ package engine
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"log"
 	"strings"
 )
 
@@ -44,17 +43,7 @@ func (st *State) CreateSystem(issuedBy, id string, x, y, z int) []error {
 	if id == "" {
 		id = uuid.New().String()
 	}
-	if _, ok := st.colonies[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.planets[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.polities[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.ships[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.stars[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.systems[id]; ok {
+	if st.isDuplicateID(id) {
 		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
 	}
 
@@ -65,6 +54,5 @@ func (st *State) CreateSystem(issuedBy, id string, x, y, z int) []error {
 	system.name = fmt.Sprintf("%02d-%02d-%02d", x, y, z)
 	st.systems[id] = system
 
-	log.Printf("[?] created %s\n", system.name)
 	return nil
 }

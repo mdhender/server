@@ -285,6 +285,24 @@ func (st *State) assignSystemName(system *System, name string) error {
 	return fmt.Errorf("State.assignSystemName: %w", ERRNOTIMPLEMENTED)
 }
 
+// isDuplicateID returns true if the id is already in a map.
+func (st *State) isDuplicateID(id string) bool {
+	if _, ok := st.colonies[id]; ok {
+		return true
+	} else if _, ok := st.planets[id]; ok {
+		return true
+	} else if _, ok := st.polities[id]; ok {
+		return true
+	} else if _, ok := st.ships[id]; ok {
+		return true
+	} else if _, ok := st.stars[id]; ok {
+		return true
+	} else if _, ok := st.systems[id]; ok {
+		return true
+	}
+	return false
+}
+
 // permissionToColonize enables a ship to establish a new colony on a planet.
 // Permission expires at the end of the current turn.
 func (st *State) permissionToColonize(planet *Planet, ship *Ship) error {

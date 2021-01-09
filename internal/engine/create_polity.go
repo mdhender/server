@@ -41,17 +41,7 @@ func (st *State) CreatePolity(issuedBy, id, name string) []error {
 	if id == "" {
 		id = uuid.New().String()
 	}
-	if _, ok := st.colonies[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.planets[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.polities[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.ships[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.stars[id]; ok {
-		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
-	} else if _, ok := st.systems[id]; ok {
+	if st.isDuplicateID(id) {
 		return []error{fmt.Errorf("duplicate id: %w", ERRBADREQUEST)}
 	}
 	if name == "" {
