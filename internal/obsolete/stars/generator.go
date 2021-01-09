@@ -14,32 +14,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package memory
+package stars
 
 import (
 	"fmt"
-	"github.com/mdhender/server/internal/obsolete/auth"
-	"github.com/mdhender/server/internal/obsolete/updating"
+	"github.com/google/uuid"
+	"github.com/mdhender/server/internal/obsolete/orbits"
+	"github.com/mdhender/server/internal/prng"
 )
 
-// This file implements the updating.Repository interface
+type Generator func(ts prng.Generator) (*Star, error)
 
-// UpdateGame applies changes to an existing game to the store.
-func (m *Store) UpdateGame(a *auth.Authorization, gu updating.GameUpdates) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
+// DefaultGenerator returns a generator with the following rules:
+//   11 orbits
+//   Orbit[0] is treated as the "11th Orbit" in the rulebook.
+func DefaultGenerator() Generator {
+	generateOrbit := orbits.DefaultGenerator()
+	return func(ts prng.Generator) (*Star, error) {
+		var s Star
+		s.ID = uuid.New().String()
+		s.Name = fmt.Sprintf("%02d-%02d-%02d", 0, 0, 0)
+		for i := 1; i <= 10; i++ {
+			orbit, err := generateOrbit(ts)
+			if err != nil {
+				return nil, err
+			}
+			s.Orbits[i] = orbit
+		}
+		return &s, nil
 	}
-
-	return fmt.Errorf("not implemented")
-}
-
-// UpdateGameOrders applies a new set of orders to an existing game to the store.
-func (m *Store) UpdateGameOrders(a *auth.Authorization, o updating.Orders) error {
-	isAdmin := a.HasRole("admin")
-	if !isAdmin {
-		return updating.ErrNotAuthorized
-	}
-
-	return fmt.Errorf("not implemented")
 }

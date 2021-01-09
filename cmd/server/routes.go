@@ -17,13 +17,11 @@
 package main
 
 import (
-	"fmt"
-	engine "github.com/mdhender/server"
-	"github.com/mdhender/server/internal/adding"
-	"github.com/mdhender/server/internal/http/rest"
-	"github.com/mdhender/server/internal/listing"
-	"github.com/mdhender/server/internal/reporting"
-	"github.com/mdhender/server/internal/updating"
+	"github.com/mdhender/server/internal/obsolete/adding"
+	"github.com/mdhender/server/internal/obsolete/http/rest"
+	"github.com/mdhender/server/internal/obsolete/listing"
+	"github.com/mdhender/server/internal/obsolete/reporting"
+	"github.com/mdhender/server/internal/obsolete/updating"
 	"github.com/mdhender/server/internal/way"
 	"net/http"
 )
@@ -65,17 +63,6 @@ type routeConfig struct {
 
 func frak() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		st, err := engine.NewState()
-		if err != nil {
-			fmt.Printf("%+v\n", err)
-			http.Error(w, fmt.Sprintf("%+v\n", err), http.StatusInternalServerError)
-		}
-		fmt.Printf("%s\n", st.String())
-		//errs := st.ProcessTurn()
-		//for _, err := range errs {
-		//	fmt.Printf("%+v\n", err)
-		//}
-		//fmt.Printf("%s\n", st.String())
 		w.WriteHeader(http.StatusOK)
 	}
 }

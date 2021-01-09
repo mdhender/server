@@ -19,9 +19,9 @@ package main
 import (
 	"crypto/md5"
 	"encoding/binary"
-	"github.com/mdhender/server/internal/engine"
-	"github.com/mdhender/server/internal/gamemeta"
-	"github.com/mdhender/server/internal/users"
+	"github.com/mdhender/server/internal/obsolete/engine"
+	"github.com/mdhender/server/internal/obsolete/gamemeta"
+	"github.com/mdhender/server/internal/obsolete/users"
 	"io"
 	"net"
 	"net/http"

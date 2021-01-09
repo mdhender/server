@@ -19,8 +19,8 @@ package memory
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/mdhender/server/internal/adding"
-	"github.com/mdhender/server/internal/auth"
+	"github.com/mdhender/server/internal/obsolete/adding"
+	"github.com/mdhender/server/internal/obsolete/auth"
 	"strings"
 )
 
