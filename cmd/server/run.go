@@ -62,10 +62,11 @@ func run(cfg *config) error {
 	fmt.Printf("^^^^^ ------------------------------------------------------\n")
 
 	var os engine.Orders
-
+	var errorCount int
 	for i := 0; i < 2; i++ {
 		os.Prioritize()
 		if errs := st.ProcessOrders(os, true); len(errs) != 0 {
+			errorCount += len(errs)
 			fmt.Printf("------------------------------------------------------------\n")
 			fmt.Printf("errors -----------------------------------------------------\n")
 			var counter int
@@ -82,8 +83,8 @@ func run(cfg *config) error {
 		fmt.Println(st.String())
 		fmt.Printf("^^^^^ ------------------------------------------------------\n")
 	}
-	if len(os) == 0 {
-		return nil
+	if errorCount != 0 {
+		return fmt.Errorf("orders failed")
 	}
 
 	log.Printf("[server] listening on %s\n", srv.Addr)
