@@ -23,25 +23,25 @@ import (
 	"github.com/google/uuid"
 )
 
-func mksystem(x, y, z int) *System {
-	system := &System{
-		id:   uuid.New().String(),
-		name: fmt.Sprintf("%02d-%02d-%02d", x, y, z),
+func mkorbit(star *Star, ring int) *Orbit {
+	star.orbits[ring] = &Orbit{
+		id:     uuid.New().String(),
+		name:   fmt.Sprintf("%s-%02d", star.name, ring),
+		system: star.system,
+		star:   star,
+		ring:   ring,
 	}
-	system.coords.x = x
-	system.coords.y = y
-	system.coords.z = z
-	return system
+	return star.orbits[ring]
 }
 
-// System (or Star System) is a group of 1 to 5 Stars.
-type System struct {
-	id     string
-	name   string
-	coords struct {
-		x int
-		y int
-		z int
-	}
-	stars []*Star // a system may have multiple stars
+type Orbit struct {
+	id       string
+	name     string
+	system   *System
+	star     *Star
+	ring     int
+	planet   *Planet     // an orbit may have a planet
+	deposits []*Resource // or it may have deposits
+	colonies []*Colony   // there may be many colonies in the orbit
+	ships    []*Ship     // there may be many ships in the orbit
 }

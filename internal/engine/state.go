@@ -27,26 +27,27 @@ import (
 type State struct {
 	turn     int
 	admins   map[string]bool // id of the administrator
-	colonies map[string]*Colony
-	planets  map[string]*Planet
 	polities map[string]*Polity
-	ships    map[string]*Ship
-	stars    map[string]*Star
 	systems  map[string]*System
+	stars    map[string]*Star
+	planets  map[string]*Planet
+	colonies map[string]*Colony
+	ships    map[string]*Ship
 
 	orders Orders
 }
 
 // NewState returns an initialized state with an administrator.
 func NewState(admins ...string) (*State, error) {
+	cluster := mkcluster()
 	st := &State{
-		admins:   make(map[string]bool),
-		colonies: make(map[string]*Colony),
-		planets:  make(map[string]*Planet),
-		polities: make(map[string]*Polity),
-		ships:    make(map[string]*Ship),
-		stars:    make(map[string]*Star),
-		systems:  make(map[string]*System),
+		admins:   cluster.admins,
+		polities: cluster.polities,
+		systems:  cluster.systems,
+		stars:    cluster.stars,
+		planets:  cluster.planets,
+		colonies: cluster.colonies,
+		ships:    cluster.ships,
 	}
 
 	if len(admins) == 0 {
@@ -81,9 +82,9 @@ func (st *State) Colony(id string) *Colony {
 	return nil
 }
 
-func (st *State) ProcessOrders(orders Orders, debug bool) (*State, []error) {
+func (st *State) ProcessOrders(orders Orders, debug bool) []error {
 	st.turn++
-	return st, st.ExecuteOrders(orders, debug)
+	return st.ExecuteOrders(orders, debug)
 }
 
 func (st *State) Planet(id string) *Planet {
@@ -119,38 +120,6 @@ func (st *State) System(id string) *System {
 		return s
 	}
 	return nil
-}
-
-type Star struct {
-	id     string
-	name   string
-	orbits [10]*Orbit
-}
-
-type Orbit struct {
-	id       string
-	planet   string
-	colonies []string
-	ships    []*Ship
-}
-
-type Planet struct {
-	id           string
-	Name         string
-	kind         PlanetKind
-	habitability int // range from 0 to 25
-	deposits     []*Resource
-	colonies     []*Colony
-}
-
-// Resource is any resource that can be mined.
-type Resource struct {
-	id              string
-	kind            ResourceKind
-	yieldPct        float64
-	unlimited       bool
-	initialAmount   int64
-	amountRemaining int64
 }
 
 type AutomationUnit struct{}

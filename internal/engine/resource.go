@@ -18,30 +18,37 @@
 
 package engine
 
-import (
-	"fmt"
-	"github.com/google/uuid"
-)
+import "github.com/google/uuid"
 
-func mksystem(x, y, z int) *System {
-	system := &System{
-		id:   uuid.New().String(),
-		name: fmt.Sprintf("%02d-%02d-%02d", x, y, z),
+func mkresource(kind ResourceKind, unlimited bool) *Resource {
+	resource := &Resource{
+		id:            uuid.New().String(),
+		kind:          kind,
+		unlimited:     unlimited,
+		initialAmount: 55 * 1_000_000_000,
+		yieldPct:      0.90,
 	}
-	system.coords.x = x
-	system.coords.y = y
-	system.coords.z = z
-	return system
+
+	if resource.kind == RGOLD {
+		resource.yieldPct /= 10
+		resource.initialAmount /= 10
+	}
+
+	resource.amountRemaining = resource.initialAmount
+
+	if resource.unlimited {
+		resource.yieldPct /= 3
+	}
+
+	return resource
 }
 
-// System (or Star System) is a group of 1 to 5 Stars.
-type System struct {
-	id     string
-	name   string
-	coords struct {
-		x int
-		y int
-		z int
-	}
-	stars []*Star // a system may have multiple stars
+// Resource is any resource that can be mined.
+type Resource struct {
+	id              string
+	kind            ResourceKind
+	unlimited       bool
+	initialAmount   int
+	amountRemaining int
+	yieldPct        float64
 }

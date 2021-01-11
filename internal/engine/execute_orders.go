@@ -199,17 +199,13 @@ func (st *State) colonyProductionStage(debug bool) []error {
 		fmt.Printf("[stage:%s] colony %s %q\n", stageName, id, c.name)
 
 		// production
-		var food []Unit
+		c.batteries.charged, c.batteries.used = 0, 0
 		for _, unit := range c.units {
 			switch unit.Kind {
 			case FARM:
-				u := unit.Produce()
-				fmt.Printf("  > %s\n", u.Sexpr())
-				food = append(food, u)
+				c.storage.food += unit.Produce().Quantity
 			case POWER:
-				u := unit.Produce()
-				fmt.Printf("  > %s\n", u.Sexpr())
-				c.batteries += u.Quantity
+				c.batteries.charged += unit.Produce().Quantity
 			}
 		}
 
@@ -414,10 +410,6 @@ func (st *State) gameDataCleanupStage(debug bool) []error {
 	// reset colonies
 	for _, colony := range st.colonies {
 		fmt.Printf("[stage:%s] colony %s %q\n", stageName, colony.id, colony.name)
-		if colony.batteries != 0 {
-
-		}
-		colony.batteries = 0
 	}
 	// reset ships
 	for _, ship := range st.ships {
@@ -660,10 +652,9 @@ func (st *State) resetStage(debug bool) []error {
 	// reset colonies
 	for _, colony := range st.colonies {
 		fmt.Printf("[stage:%s] colony %s %q\n", stageName, colony.id, colony.name)
-		if colony.batteries != 0 {
-			fmt.Printf("  > (reset (batteries %s))\n", utils.Commas(colony.batteries))
+		if colony.batteries.used != 0 {
+			fmt.Printf("  > (reset (batteries %s))\n", utils.Commas(colony.batteries.charged-colony.batteries.used))
 		}
-		colony.batteries = 0
 	}
 	// reset ships
 	for _, ship := range st.ships {

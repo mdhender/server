@@ -19,29 +19,45 @@
 package engine
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 )
 
-func mksystem(x, y, z int) *System {
-	system := &System{
-		id:   uuid.New().String(),
-		name: fmt.Sprintf("%02d-%02d-%02d", x, y, z),
+func mkstar(system *System) *Star {
+	star := &Star{
+		id:     uuid.New().String(),
+		system: system,
 	}
-	system.coords.x = x
-	system.coords.y = y
-	system.coords.z = z
-	return system
+	switch len(system.stars) {
+	case 0:
+		// just one star (so far), so no suffix on the name
+		star.name = system.name
+	case 1:
+		// two stars, so add the suffix to the first
+		system.stars[0].name = system.name + "A"
+		star.name = system.name + "B"
+	case 2:
+		star.name = system.name + "C"
+	case 3:
+		star.name = system.name + "D"
+	case 4:
+		star.name = system.name + "E"
+	case 5:
+		star.name = system.name + "F"
+	case 6:
+		star.name = system.name + "G"
+	case 7:
+		star.name = system.name + "H"
+	default:
+		panic("assert(len(system.stars) < 8)")
+	}
+	return star
 }
 
-// System (or Star System) is a group of 1 to 5 Stars.
-type System struct {
+// Star is a single star within a system.
+type Star struct {
 	id     string
 	name   string
-	coords struct {
-		x int
-		y int
-		z int
-	}
-	stars []*Star // a system may have multiple stars
+	system *System
+	// star will have 10 orbits; some may be empty
+	orbits [10]*Orbit
 }

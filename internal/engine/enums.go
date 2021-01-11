@@ -22,17 +22,11 @@ import "fmt"
 
 // enums
 type PlanetKind int
-type ResourceKind int
 
 const (
 	ASTEROIDBELT PlanetKind = iota
 	GASGIANT
 	TERRESTRIAL
-
-	//FUEL ResourceKind = iota
-	//GOLD
-	//METAL
-	//NONMETAL
 )
 
 // ColonyKind is TODO
@@ -101,6 +95,33 @@ func (k PopulationKind) String() string {
 		return "unskilled"
 	default: // OTHERS
 		return "others"
+	}
+}
+
+// ResourceKind is TODO
+type ResourceKind int
+
+// enums for ResourceKind
+const (
+	RFUEL ResourceKind = iota
+	RGOLD
+	RMETAL
+	RNONMETAL
+)
+
+// String implements the stringer interface
+func (k ResourceKind) String() string {
+	switch k {
+	case RFUEL:
+		return "FUEL"
+	case RGOLD:
+		return "GOLD"
+	case RMETAL:
+		return "METAL"
+	case RNONMETAL:
+		return "NONMETAL"
+	default:
+		return fmt.Sprintf("RESOURCE(%d)", k)
 	}
 }
 

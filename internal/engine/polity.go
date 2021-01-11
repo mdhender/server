@@ -20,6 +20,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 )
 
@@ -28,13 +29,15 @@ type Polity struct {
 	name string
 	home struct {
 		system *System
+		star   *Star
+		planet *Planet
+		colony *Colony
 		world  string
-		colony string
 	}
 	controls struct {
 		colonies map[string]*Colony
-		ships    map[string]*Ship
 		polities map[string]*Polity // there should never be more than one level in this hierarchy.
+		ships    map[string]*Ship
 	}
 	viceroyOf *Polity // viceroy to this polity
 	diplomacy map[string]DiplomaticStatus
@@ -42,6 +45,15 @@ type Polity struct {
 		colony int
 		ship   int
 	}
+}
+
+func polity() *Polity {
+	p := &Polity{id: uuid.New().String()}
+	p.controls.colonies = make(map[string]*Colony)
+	p.controls.polities = make(map[string]*Polity)
+	p.controls.ships = make(map[string]*Ship)
+	p.diplomacy = make(map[string]DiplomaticStatus)
+	return p
 }
 
 func (p *Polity) addColony(c *Colony) {
@@ -100,8 +112,9 @@ func (p *Polity) isViceroyOf(t *Polity) bool {
 }
 
 func (p *Polity) nextColonyNumber() string {
+	number := fmt.Sprintf("C%d", p.seq.colony)
 	p.seq.colony++
-	return fmt.Sprintf("C%d", p.seq.colony)
+	return number
 }
 
 func (p *Polity) nextShipNumber() string {

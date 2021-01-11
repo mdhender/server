@@ -18,6 +18,34 @@
 
 package engine
 
+import (
+	"github.com/google/uuid"
+)
+
+func mkcolony(polity *Polity, orbit *Orbit, planet *Planet, kind ColonyKind) *Colony {
+	if planet != nil {
+		orbit = planet.orbit
+	}
+	colony := &Colony{
+		id:     uuid.New().String(),
+		kind:   kind,
+		number: polity.nextColonyNumber(),
+		polity: polity,
+	}
+	if planet == nil {
+		colony.system = orbit.star.system
+		colony.star = orbit.star
+		colony.orbit = orbit
+		orbit.colonies = append(orbit.colonies, colony)
+	} else {
+		colony.system = planet.orbit.star.system
+		colony.star = planet.orbit.star
+		colony.planet = planet
+		planet.colonies = append(planet.colonies, colony)
+	}
+	return colony
+}
+
 type Colony struct {
 	id                string
 	kind              ColonyKind
@@ -25,6 +53,9 @@ type Colony struct {
 	polity            *Polity
 	originalPolity    *Polity // set only if this is a Home Colony
 	system            *System
+	star              *Star
+	orbit             *Orbit  // must be in an orbit
+	planet            *Planet // may be on a planet
 	name              string
 	note              Text
 	population        Population
@@ -51,7 +82,10 @@ type Colony struct {
 	controls struct {
 		ships map[string]*Ship // acts as home port to
 	}
-	batteries int // power from a plant that expires at the end of the turn
+	batteries struct {
+		charged int // power from a plant that expires at the end of the turn
+		used    int
+	}
 }
 
 func (c *Colony) addShip(s *Ship) {

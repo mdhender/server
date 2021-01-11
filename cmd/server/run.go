@@ -56,45 +56,34 @@ func run(cfg *config) error {
 		return fmt.Errorf("engine: %w", err)
 	}
 	log.Printf("[run] state created with default admin of %q\n", admin)
+	fmt.Printf("admins are %v\n", st.Admins())
+	fmt.Printf("------------------------------------------------------------\n")
+	fmt.Println(st.String())
+	fmt.Printf("^^^^^ ------------------------------------------------------\n")
 
 	var os engine.Orders
-	os = append(os, (&engine.Order{CreateAdmin: &engine.CreateAdmin{ID: "mdhender"}}).Stamp(admin))
 
-	var scarcity bool
-	for _, input := range []*struct {
-		polity  string
-		system  string
-		x, y, z int
-	}{
-		{"usagi", "Shikoku", 1, 1, 1},
-		{"tomoe", "Kyushu", 2, 2, 2},
-	} {
-		os = append(os, (&engine.Order{CreateSystem: &engine.CreateSystem{X: input.x, Y: input.y, Z: input.z}}).Stamp(admin))
-		os = append(os, (&engine.Order{CreatePolity: &engine.CreatePolity{ID: input.polity, Name: input.polity}}).Stamp(admin))
-		log.Printf("[state] polity %q\n", input.polity)
-
-		//system := st.MakeSystem(input.sysname, input.x, input.y, input.z)
-		//log.Printf("[state] system %q\n", system.name)
-		//polity.home.system = system
-		//
-		//system.stars[0].orbits[5].planet = st.MakeHomePlanet(polity, scarcity)
-
-		scarcity = !scarcity
-	}
-
-	os.Prioritize()
-	if st, errs := st.ProcessOrders(os, true); len(errs) != 0 {
-		fmt.Printf("errors -----------------------------------------------------\n")
-		var counter int
-		for _, err := range errs {
-			if !errors.Is(err, engine.ERRNOTIMPLEMENTED) {
-				fmt.Printf("%+v\n", err)
-			} else if counter = counter + 1; counter < 5 {
-				fmt.Printf("%+v\n", err)
+	for i := 0; i < 2; i++ {
+		os.Prioritize()
+		if errs := st.ProcessOrders(os, true); len(errs) != 0 {
+			fmt.Printf("------------------------------------------------------------\n")
+			fmt.Printf("errors -----------------------------------------------------\n")
+			var counter int
+			for _, err := range errs {
+				if !errors.Is(err, engine.ERRNOTIMPLEMENTED) {
+					fmt.Printf("%+v\n", err)
+				} else if counter = counter + 1; counter < 5 {
+					fmt.Printf("%+v\n", err)
+				}
 			}
+
 		}
-		fmt.Printf("admins are %v\n", st.Admins())
-		return fmt.Errorf("found %d errors", len(errs))
+		fmt.Printf("------------------------------------------------------------\n")
+		fmt.Println(st.String())
+		fmt.Printf("^^^^^ ------------------------------------------------------\n")
+	}
+	if len(os) == 0 {
+		return nil
 	}
 
 	log.Printf("[server] listening on %s\n", srv.Addr)
