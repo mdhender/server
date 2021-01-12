@@ -139,6 +139,7 @@ const (
 	LIGHTSTRUCTURAL
 	METAL
 	MINE
+	MINEGROUP
 	NONMETAL
 	POPULATION
 	POWER
@@ -164,6 +165,8 @@ func (k UnitKind) String() string {
 		return "METAL"
 	case MINE:
 		return "MINE"
+	case MINEGROUP:
+		return "MINEGROUP"
 	case NONMETAL:
 		return "NONMETAL"
 	case NOOP:

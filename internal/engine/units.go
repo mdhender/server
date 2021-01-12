@@ -79,6 +79,8 @@ func (u Unit) Mass() float64 {
 		massPerUnit = 1
 	case MINE:
 		massPerUnit = (2 * techLevel) + 10
+	case MINEGROUP:
+		massPerUnit = 0
 	case NONMETAL:
 		massPerUnit = 1
 	case NOOP:
@@ -109,6 +111,10 @@ func (u Unit) Materials() (metals, nonMetals float64) {
 	case GOLD:
 		return 0, 0
 	case METAL:
+		return 0, 0
+	case MINE:
+		return 5 + techLevel, 5 + techLevel
+	case MINEGROUP:
 		return 0, 0
 	case NONMETAL:
 		return 0, 0
@@ -161,6 +167,8 @@ func (u Unit) Sexpr() string {
 		return fmt.Sprintf("(metal %s)", utils.Commas(u.Quantity))
 	case MINE:
 		return fmt.Sprintf("(mine (tl %d) (qty %s))", u.TechLevel, utils.Commas(u.Quantity))
+	case MINEGROUP:
+		return fmt.Sprintf("(mine-group (tl %d) (deposit %s))", u.TechLevel, "?todo?")
 	case NONMETAL:
 		return fmt.Sprintf("(non-metal %s)", utils.Commas(u.Quantity))
 	case NOOP:
@@ -232,6 +240,8 @@ func (u Unit) Volume() float64 {
 		if u.Assembled {
 			containersPerUnit *= 2
 		}
+	case MINEGROUP:
+		containersPerUnit = 0
 	case NONMETAL:
 		containersPerUnit = 0.5
 	case NOOP:
